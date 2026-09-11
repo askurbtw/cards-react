@@ -1,11 +1,5 @@
 import { createContext, useContext} from "react";
-
-export interface GameContextType {
-    numberOfPlayers: number | null;
-    playerName:string | null
-    setNumberOfPlayers:(count:number)=>void;
-    setPlayerName:(name:string)=>void;
-}
+import {type GameContextType} from "../types/gamecontexttype.types";
 
 export const GameContext = createContext<GameContextType | undefined>(undefined);
 

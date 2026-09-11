@@ -1,5 +1,7 @@
+import styles from '/legacy/style1.module.css'
 import { useGame } from "../context/GameContext";
 import { useNavigate } from "react-router-dom";
+
 
 export default function HomePage() {
     const navigate = useNavigate()

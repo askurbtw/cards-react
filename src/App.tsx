@@ -1,4 +1,3 @@
-import '/legacy/style1.css'
 import HomePage from './pages/HomePage'
 import GamePage from './pages/GamePage'
 import { GameContextProvider } from './context/GameContextProvider'
