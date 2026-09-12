@@ -4,19 +4,17 @@ import { DeckComponent } from '../components/DeckComponent'
 import createDeck from '../gameLogic/createDeck'
 import shuffleDeck from '../utils/shuffleDeck'
 import '/legacy/style.css'
+import { initializePlayers } from '../gameLogic/initializePlayers'
 
 
 export default function GamePage() {
-    const shuffledDeck = shuffleDeck(createDeck())
-    
-
-
-
-    const { numberOfPlayers } = useGame()
-
-    if (!numberOfPlayers) {
+    const { numberOfPlayers, playerName } = useGame()
+    if (!numberOfPlayers || !playerName) {
         return <Navigate to='/' replace />
     }
+    const shuffledDeck = shuffleDeck(createDeck())
+    const players = initializePlayers(numberOfPlayers, playerName, shuffledDeck)
+    console.log(players)
 
     return (<>
         <div>
@@ -52,7 +50,7 @@ export default function GamePage() {
                                 </div>
                             </div>
                             <div id="deck-part-of-field">
-                                <DeckComponent deck={shuffledDeck}/>
+                                <DeckComponent deck={shuffledDeck} />
                                 <div id="leftovers">
 
                                 </div>

@@ -1,7 +1,7 @@
 import {type Card} from "./card.types";
 
 export  interface Player{
-    id:string;
+    id:number;
     name:string;
     cards:Card[];
     isOutOfCards:boolean;

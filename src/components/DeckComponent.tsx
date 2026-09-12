@@ -8,7 +8,7 @@ export function DeckComponent(props:{deck:Deck}){
         cardsToAdd.push(`/images/cards/reverse_card.svg`)
     }
     return(
-        <div className="deck">
+        <div id="deck">
             <div>
                 <img src={`/images/cards/${props.deck.trump?.value}_of_${props.deck.trump?.suit}.svg`} alt="" />
 

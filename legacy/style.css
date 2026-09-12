@@ -423,4 +423,118 @@ cursor: pointer;}
 }
 
 
+header{
+    background-color: antiquewhite;
+    border-radius: 20px;
+    border:solid 3px #83FF3B;
+    width: 100%;             /* Розтягує хедер на всю ширину екрана */
+    box-sizing: border-box;  /* Запобігає виходу за межі екрана через padding */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 0;
+    
+}
+header ul{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 200px;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#header-li li{
+    color:#2F2F2F;
+    list-style: none;
+    text-align: center;
+    font-weight: 700;
+    background-color: #83FF3B;
+    padding: 0 20px;
+    border-radius: 10px;
+    border: solid 2px;
+    
+}
+#header-li h2{
+    font-weight: bold;
+}
+nav {
+    width: 100%;             /* Розтягує nav на всю ширину хедера */
+    display: flex;
+    justify-content: center;
+}
+#game-settings{
+    border:solid 3px #83FF3B;
+    background-color: antiquewhite;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    padding: 20px 0px 400px 0px;
+    margin:25px 0 25px 0;
+    gap: 50px;
+
+}
+#players-label{
+    background-color: #83FF3B;
+    padding:10px 10px;
+    border-radius: 10px;
+    margin:0 5px 0 0;
+    font-weight: bold;
+    border: solid 2px;
+}
+#players-select{
+    color:#2F2F2F;
+    font-weight: normal;
+    background-color: bisque;
+    padding: 10px 3px;
+    border-radius: 4px;
+    border: solid 2px;
+    cursor:pointer;
+    
+}
+#players-select:hover{
+    border-color: aqua;
+}
+#game-launch{
+    background-color: antiquewhite;
+    border:solid 3px #83FF3B;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    padding:50px
+}
+#start-game{
+    background-color: #83FF3B;
+    border-radius: 5px;
+    border: solid 2px;
+    padding:20px;
+    font-weight: bold;
+}
+#name-input{
+    outline: none;
+    background-color:rgb(251, 207, 48);
+    border:solid 2px;
+    border-radius: 3px;
+    text-align: center;
+    font-weight: bold;
+    color: #2D2D2D;
+}
+#name-input::placeholder{
+    color:#2D2D2D;
+    font-weight: bold;
+    text-align: center;
+    transition: color 0.1s ease;
+}
+#name-input:focus{
+    border:solid 2px #83FF3B !important
+}
+#name-input:focus::placeholder{
+    color:transparent
+}
+
+
+
 
