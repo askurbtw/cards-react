@@ -1,22 +1,28 @@
-import { type Deck, type Player } from "../types";
-// import { initializeCard } from "./initializeCard";
 
-export function initializePlayers(numberOfPlayers:number  , playerName:string, deck:Deck):Player[]{
+import { type Deck, type Player } from "../types";
+import { initializePlayerCard } from "./initializePlayerCard";
+
+
+
+export function initializePlayers(numberOfPlayers:number  , playerName:string, deck:Deck):[Player[],Deck]{
     const players:Player[]=[]
+    const deckCopy : Deck = {
+        numberOfCards:Number(numberOfPlayers), cards:structuredClone(deck.cards), trump:structuredClone(deck.trump)
+    }
+
     players.push({id:1,name:playerName,cards:[],isOutOfCards:false})
     for(let i=2;i<=numberOfPlayers;i++){
-        players.push({id:i,name:`Bot#${i}`, cards:[],isOutOfCards:false})
-    }
-    if(players.length!==0){
-        for(let i=0;i<numberOfPlayers*6;i++){
-            // const pickedCard = initializeCard(deck.cards.pop(),players[i%numberOfPlayers])
-            const pickedCard = deck.cards.pop()
-            if(pickedCard){
-            players[i%numberOfPlayers].cards.push(pickedCard)
-            } 
-        }
+        players.push({id:i,name:`Bot#${i-1}`, cards:[],isOutOfCards:false})
     }
     
-    return players
+    if(players.length!==0){
+        for(let i=0;i<numberOfPlayers*6;i++){
+            initializePlayerCard(deckCopy,players[i%numberOfPlayers])
+           
+        }
+    }
+    console.log(players)
+    
+    return [players,deckCopy]
 
 }

@@ -1,4 +1,6 @@
+
 import {type Card, type Deck, ALL_SUITS, ALL_VALUES} from '../types'
+import shuffleDeck from '../utils/shuffleDeck';
 import createTrump from './createTrump';
 
 export default function createDeck(): Deck{
@@ -18,6 +20,7 @@ export default function createDeck(): Deck{
         cards,
         trump
     }
-    return deck
+    shuffleDeck(deck)
     
+    return deck
 }
