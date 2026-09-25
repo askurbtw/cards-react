@@ -17,7 +17,7 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
                 <ul style={{ '--count': count } as React.CSSProperties}>
                     {playerInfo.cards.map((card,index)=>{
                         return(
-                            <CardComponent key = {`${card.value} - ${card.value}`} card={card} index={index} ref={(node)=>{
+                            <CardComponent key = {`${card.value} - ${card.suit}`} card={card} index={index} ref={(node)=>{
                                 if(node){
                                     cardEls.set(card.id, node)
                                 }
