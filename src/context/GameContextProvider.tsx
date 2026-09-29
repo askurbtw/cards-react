@@ -14,6 +14,10 @@ export const GameContextProvider = ({ children } : { children: ReactNode})=>{
         setPlayerName(playerName)
         setGame(createGame(numberOfPlayers,playerName))
     }
+
+    
+
+
     const contextValue = {
         numberOfPlayers,
         playerName,

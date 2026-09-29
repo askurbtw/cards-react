@@ -1,9 +1,9 @@
-import type { Card } from "../types";
+import type { Card, DeckCard } from "../types";
 
 
 export default function checkValidCard(
   cardToCheck: Card,
-  currentCards: Card[],
+  currentCards: DeckCard[],
   moveType: string,
   movesCounter:number,
   trumpCard:Card |null
@@ -12,14 +12,14 @@ export default function checkValidCard(
   if (cardToCheck && currentCards && moveType && trumpCard) {
     if (moveType === "attack") {
       if (
-        !currentCards.some((card) => card.value === cardToCheck.value) &&
+        !currentCards.some((card) => card.card.value === cardToCheck.value) &&
         movesCounter !== 1
       ) {
         return false;
       }
       if (
         movesCounter === 1 ||
-        currentCards.some((card) => card.value === cardToCheck.value)
+        currentCards.some((card) => card.card.value === cardToCheck.value)
       ) {
         return true;
       }
@@ -27,10 +27,10 @@ export default function checkValidCard(
     if (moveType === "defence") {
       const currentCard = currentCards[currentCards.length - 1];
       const isValidMove =
-        (cardToCheck.value > currentCard.value &&
-          cardToCheck.suit === currentCard.suit) ||
+        (cardToCheck.value > currentCard.card.value &&
+          cardToCheck.suit === currentCard.card.suit) ||
         (cardToCheck.suit === trumpCard.suit &&
-          currentCard.suit !== trumpCard.suit);
+          currentCard.card.suit !== trumpCard.suit);
 
       if (isValidMove) {
         return true;

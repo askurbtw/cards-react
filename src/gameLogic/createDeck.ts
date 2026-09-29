@@ -1,6 +1,6 @@
 
 import {type Card, type Deck, ALL_SUITS, ALL_VALUES} from '../types'
-import shuffleDeck from '../utils/shuffleDeck';
+import shuffleCards from '../utils/shuffleCards';
 import createTrump from './createTrump';
 
 export default function createDeck(): Deck{
@@ -13,13 +13,13 @@ export default function createDeck(): Deck{
         index++;
       }
     }
-    
-    const trump = createTrump(cards)
+    const shuffledCards = shuffleCards(cards)
+    const trump = createTrump(shuffledCards)
     const deck: Deck = {
-        cards,
+        cards:shuffledCards,
         trump
     }
-    shuffleDeck(deck)
+    
     
     return deck
 }
