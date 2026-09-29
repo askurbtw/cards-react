@@ -6,6 +6,7 @@ import type { Card } from "../types";
 interface CardProps {
   card: Card,
   index:number,
+
 }
 
 export const CardComponent = forwardRef<HTMLLIElement, CardProps>(

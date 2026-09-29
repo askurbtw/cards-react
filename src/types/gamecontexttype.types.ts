@@ -1,6 +1,10 @@
+import type { GameState } from "./gamestate.types";
+
+
 export interface GameContextType {
     numberOfPlayers: number | null;
-    playerName:string | null
-    setNumberOfPlayers:(count:number)=>void;
-    setPlayerName:(name:string)=>void;
+    playerName:string | null;
+    game: GameState | null;
+    startGame: (numberOfPlayers: number, playerName: string) => void
+    
 }

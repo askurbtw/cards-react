@@ -3,3 +3,4 @@ export * from './player.types';
 export * from './deck.types';
 export * from './deckcard.types';
 export * from './gamecontexttype.types'
+export * from './gamestate.types'

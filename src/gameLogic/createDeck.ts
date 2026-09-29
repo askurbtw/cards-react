@@ -13,10 +13,9 @@ export default function createDeck(): Deck{
         index++;
       }
     }
-    const numberOfCards = cards.length
+    
     const trump = createTrump(cards)
     const deck: Deck = {
-        numberOfCards,
         cards,
         trump
     }

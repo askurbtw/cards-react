@@ -7,7 +7,7 @@ import { initializePlayerCard } from "./initializePlayerCard";
 export function initializePlayers(numberOfPlayers:number  , playerName:string, deck:Deck):[Player[],Deck]{
     const players:Player[]=[]
     const deckCopy : Deck = {
-        numberOfCards:Number(numberOfPlayers), cards:structuredClone(deck.cards), trump:structuredClone(deck.trump)
+        cards:structuredClone(deck.cards), trump:structuredClone(deck.trump)
     }
 
     players.push({id:1,name:playerName,cards:[],isOutOfCards:false})
@@ -22,6 +22,8 @@ export function initializePlayers(numberOfPlayers:number  , playerName:string, d
         }
     }
     console.log(players)
+    console.log(deckCopy)
+    
     
     return [players,deckCopy]
 

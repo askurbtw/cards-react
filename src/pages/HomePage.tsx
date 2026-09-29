@@ -1,11 +1,15 @@
 
+import {  useState } from "react";
 import { useGame } from "../context/GameContext";
 import { useNavigate } from "react-router-dom";
 
 
+
 export default function HomePage() {
+    const {startGame} = useGame()
     const navigate = useNavigate()
-    const { numberOfPlayers, playerName, setNumberOfPlayers, setPlayerName } = useGame()
+    const [numberOfPlayers, setNumberOfPlayers]=useState<number | null >(null)
+    const [playerName, setPlayerName] = useState<string>('')
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPlayerName(String(event.target.value))
     }
@@ -21,7 +25,7 @@ export default function HomePage() {
             alert(`Player name was not assigned.`)
             return
         }
-
+        startGame(numberOfPlayers,playerName)
         navigate('/GamePage')
 
     }
