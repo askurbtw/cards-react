@@ -10,4 +10,5 @@ export interface GameContextType {
     applyMove: ( card:Card) => void;
     applyPass: () => void;
     
+    
 }

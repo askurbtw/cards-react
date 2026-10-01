@@ -21,10 +21,10 @@ export default function TableComponent({ deck, text, currentCards, leftovers }: 
             }
             const pair = map.get(moveNumber)
             if (moveType === "attack") {
-                pair.attackCard = card
+                pair.attackCard = card.card
             }
             if (moveType === "defence") {
-                pair.defenceCard = card
+                pair.defenceCard = card.card
             }
 
         })
@@ -40,7 +40,7 @@ export default function TableComponent({ deck, text, currentCards, leftovers }: 
                 <div id="game-field">
                     <div id="cards-part-of-field">
                         {pairedMoves.map((cards) => {
-                            return <CardsContainerComponent index={cards.moveNumber} attackCard={cards.attackCard} defenceCard={cards.defenceCard} />
+                            return <CardsContainerComponent  index={cards.moveNumber} key={`${cards.moveNumber} ${cards.attackCard}_${cards.defenceCard}`} attackCard={cards.attackCard} defenceCard={cards.defenceCard} />
                         })}
                     </div>
                     <div id="deck-part-of-field">
@@ -51,7 +51,6 @@ export default function TableComponent({ deck, text, currentCards, leftovers }: 
                                     <img src="/images/cards/reverse_card.svg" alt="" />
                                 </div>
                             })}
-
                         </div>
                     </div>
                 </div>

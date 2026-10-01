@@ -8,7 +8,7 @@ export default function checkValidCard(
   movesCounter:number,
   trumpCard:Card |null
 ) {
-  console.log(trumpCard)
+  
   if (cardToCheck && currentCards && moveType && trumpCard) {
     if (moveType === "attack") {
       if (
@@ -26,6 +26,7 @@ export default function checkValidCard(
     }
     if (moveType === "defence") {
       const currentCard = currentCards[currentCards.length - 1];
+      
       const isValidMove =
         (cardToCheck.value > currentCard.card.value &&
           cardToCheck.suit === currentCard.card.suit) ||

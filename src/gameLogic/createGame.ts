@@ -13,7 +13,9 @@ export default function createGame(numberOfPlayers:number, playerName:string) : 
         currentId:players[0].id,
         leftovers:[],
         movesCounter:1,
-        disablePassButton:true
+        disablePassButton:true,
+        status: 'playing',
+        finishOrder: [],
     }
 
 }

@@ -11,8 +11,8 @@ export function initializePlayers(numberOfPlayers:number  , playerName:string, d
     }
 
     players.push({id:0,name:playerName,cards:[],isOutOfCards:false})
-    for(let i=1;i<=numberOfPlayers;i++){
-        players.push({id:i,name:`Bot#${i-1}`, cards:[],isOutOfCards:false})
+    for(let i=1;i<numberOfPlayers;i++){
+        players.push({id:i,name:`Bot#${i}`, cards:[],isOutOfCards:false})
     }
     
     if(players.length!==0){

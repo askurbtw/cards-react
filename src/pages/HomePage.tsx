@@ -48,7 +48,7 @@ export default function HomePage() {
                         <label htmlFor="players-select" id="players-label"
                         >Select number of players
                         </label>
-                        <select name="players-select" id="players-select" onChange={handleSelectChange} defaultValue={undefined}>
+                        <select name="players-select" id="players-select" onChange={handleSelectChange} defaultValue={""}>
                             <option value="" disabled>Players</option>
                             <option value="2">2</option>
                             <option value="3">3</option>

@@ -15,7 +15,7 @@ export const CardComponent = forwardRef<HTMLLIElement, CardProps>(
     function Card({card,index, playerIndex, onClick,isInvalid},ref) {
     return(
         <li ref={ref} style={{'--i':index} as React.CSSProperties} >
-            <div className={`the-card ${playerIndex===1?"card-flipped":null}
+            <div className={`the-card ${playerIndex===0?"card-flipped":null}
                 ${isInvalid?"invalid-card":null}`} onClick={onClick}>
                 <img src="/images/cards/reverse_card.svg" className="the-front" />
                 <img src={`/images/cards/${card.value}_of_${card.suit}.svg`} className="the-back"  />

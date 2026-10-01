@@ -17,16 +17,22 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
     const cardEls = useRef(new Map<string, HTMLLIElement>()).current;
     const count = playerInfo.cards.length
     const handleClick = (card:Card, cardRef:HTMLLIElement | undefined)=>{
+        console.log(card)
+        console.log(game?.currentId)
         if(game?.currentId === playerInfo.id && cardRef){
+            console.log("Card clicked")
             const moveType = game.attackerId === playerInfo.id?"attack":"defence"
             if(checkValidCard(card,game.currentCards,moveType,game.movesCounter,game.deck.trump)){
+
                 console.log("Valid")
                 applyMove(card)
             }
             else{
                 console.log("Card is invalid.")
                 setInvalidCardId(card.id)
-
+                setTimeout(() => {
+                    setInvalidCardId(null)
+                }, 400);
             }
         }
         else{
@@ -34,7 +40,7 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
         }
     }
     const handlePass = ()=>{
-        if(playerInfo.id===1){
+        if(playerInfo.id===0){
             if(game){
                 applyPass()
             }
@@ -42,11 +48,11 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
     }
 
     return (
-        <div id={`player-${playerInfo.id}`} className="hand">
+        <div id={`player-${playerInfo.id+1}`} className="hand">
             <ul style={{ '--count': count } as React.CSSProperties}>
                 {playerInfo.cards.map((card, index) => {
                     return (
-                        <CardComponent key={`${card.value} - ${card.suit}`} card={card} index={index} onClick = {playerInfo.id===1?()=>handleClick(card,cardEls.get(card.id)):undefined} playerIndex={playerInfo.id} isInvalid={card.id===invalidCardId?true:null}  ref={(node) => {
+                        <CardComponent key={`${card.value} - ${card.suit}`} card={card} index={index} onClick = {playerInfo.id===0?()=>handleClick(card,cardEls.get(card.id)):undefined} playerIndex={playerInfo.id} isInvalid={card.id===invalidCardId?true:null}  ref={(node) => {
                             if (node) {
                                 cardEls.set(card.id, node)
                             }
@@ -57,7 +63,7 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
                     )
                 })}
             </ul>
-            {playerInfo.id === 1 && <button id="pass-btn" onClick={handlePass} className={game?.disablePassButton?`hidden`:undefined}>Pass</button>}
+            {playerInfo.id === 0 && <button id="pass-btn" onClick={handlePass} className={game?.disablePassButton?`hidden`:undefined}>Pass</button>}
         </div>
     )
 

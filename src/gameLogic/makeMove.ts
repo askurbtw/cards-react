@@ -5,8 +5,9 @@ export default function makeMove(
   state: GameState,
   card: Card
   
-): GameState {
-    let moveNumber = state.movesCounter
+): GameState | null {
+  if(state.status==='finished') return null
+  let moveNumber = state.movesCounter
   const playersCopy = structuredClone(state.players);
   const currentCardsCopy = structuredClone(state.currentCards);
   const currentPlayer = getPlayer(playersCopy, state.currentId);
@@ -17,7 +18,9 @@ export default function makeMove(
     currentPlayer.cards = currentPlayer.cards.filter((playerCard) => {
       return playerCard.id != card.id;
     });
+    console.log(card)
     const cardToDeck = { card, moveType, moveNumber   };
+    console.log(cardToDeck)
     currentCardsCopy.push(cardToDeck);
     nextPlayerId = state.defenderId;
   } else {
@@ -27,8 +30,11 @@ export default function makeMove(
     const cardToDeck = { card, moveType, moveNumber };
     currentCardsCopy.push(cardToDeck);
     nextPlayerId = state.attackerId;
+    moveNumber++;
   }
-  moveNumber+=1
+  
+
+  
   
 
   return {
@@ -36,6 +42,7 @@ export default function makeMove(
     players:playersCopy,
     currentCards:currentCardsCopy,
     movesCounter:moveNumber,
-    currentId:nextPlayerId
+    currentId:nextPlayerId,
+    disablePassButton: nextPlayerId===0?false:true
   };
 }
