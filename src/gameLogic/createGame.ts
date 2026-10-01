@@ -12,7 +12,8 @@ export default function createGame(numberOfPlayers:number, playerName:string) : 
         defenderId:players[1].id,
         currentId:players[0].id,
         leftovers:[],
-        movesCounter:1
+        movesCounter:1,
+        disablePassButton:true
     }
 
 }

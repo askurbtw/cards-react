@@ -13,7 +13,7 @@ interface PlayerComponentProps {
 
 export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
     const [invalidCardId, setInvalidCardId] = useState<string | null>(null)
-    const {game} = useGame()
+    const {game, applyMove, applyPass } = useGame()
     const cardEls = useRef(new Map<string, HTMLLIElement>()).current;
     const count = playerInfo.cards.length
     const handleClick = (card:Card, cardRef:HTMLLIElement | undefined)=>{
@@ -21,6 +21,7 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
             const moveType = game.attackerId === playerInfo.id?"attack":"defence"
             if(checkValidCard(card,game.currentCards,moveType,game.movesCounter,game.deck.trump)){
                 console.log("Valid")
+                applyMove(card)
             }
             else{
                 console.log("Card is invalid.")
@@ -30,6 +31,13 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
         }
         else{
             return
+        }
+    }
+    const handlePass = ()=>{
+        if(playerInfo.id===1){
+            if(game){
+                applyPass()
+            }
         }
     }
 
@@ -49,7 +57,7 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
                     )
                 })}
             </ul>
-            {playerInfo.id === 1 && <button id="pass-btn" className="hidden">Pass</button>}
+            {playerInfo.id === 1 && <button id="pass-btn" onClick={handlePass} className={game?.disablePassButton?`hidden`:undefined}>Pass</button>}
         </div>
     )
 

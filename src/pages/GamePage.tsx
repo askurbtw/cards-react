@@ -10,7 +10,7 @@ export default function GamePage() {
     if (!game) {
         return <Navigate to='/' replace />
     }
-
+    
     return (<>
         <div>
             <div id="game-grid">
@@ -18,7 +18,7 @@ export default function GamePage() {
                     return <PlayerComponent key={player.id} playerInfo={player} />
                 })}
                 <div id="cards-field">
-                    <TableComponent deck={game.deck} text={`${getPlayer(game,game.attackerId).name}' turn to ${getPlayer(game,game.defenderId).name}`} currentCards={game.currentCards} leftovers={game.leftovers} />
+                    <TableComponent deck={game.deck} text={`${getPlayer(game.players,game.attackerId).name}' turn to ${getPlayer(game.players,game.defenderId).name}`} currentCards={game.currentCards} leftovers={game.leftovers} />
                 </div>
             </div>
         </div>
