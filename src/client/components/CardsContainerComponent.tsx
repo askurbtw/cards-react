@@ -1,4 +1,4 @@
-import type { Card } from "../types";
+import type { Card } from "@shared/types";
 
 interface CardsContainerComponentProps{
     index: number;

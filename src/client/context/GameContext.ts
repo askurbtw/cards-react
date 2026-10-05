@@ -1,5 +1,5 @@
 import { createContext, useContext} from "react";
-import {type GameContextType} from "../types/gamecontexttype.types";
+import {type GameContextType} from "@shared/types";
 
 export const GameContext = createContext<GameContextType | null>(null);
 

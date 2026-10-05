@@ -1,9 +1,9 @@
 import {  Navigate } from 'react-router-dom'
 import { useGame } from '../context/GameContext'
-import '/legacy/style.css'
+import '../../style.css'
 import PlayerComponent from '../components/PlayerComponent'
 import TableComponent from '../components/TableComponent'
-import getPlayer from '../utils/getPlayer'
+import getPlayer from '@shared/utils/getPlayer'
 
 export default function GamePage() {
     const { game } = useGame()

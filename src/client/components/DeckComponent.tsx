@@ -1,4 +1,4 @@
-import type { Deck } from "../types";
+import type { Deck } from "@shared/types";
 import React from "react";
 
 export function DeckComponent(props: { deck: Deck }) {

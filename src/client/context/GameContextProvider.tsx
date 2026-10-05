@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { type ReactNode } from "react";
 import { GameContext } from "./GameContext";
-import type { Card, GameState, } from "../types";
-import createGame from "../gameLogic/createGame";
-import makeMove from "../gameLogic/makeMove";
-import makePass from "../gameLogic/makePass";
-import botFindValidCard from "../gameLogic/botFindValidCard";
+import type { Card, GameState, } from "@shared/types";
+import createGame from "@shared/gameLogic/createGame";
+import makeMove from "@shared/gameLogic/makeMove";
+import makePass from "@shared/gameLogic/makePass";
+import botFindValidCard from "@shared/gameLogic/botFindValidCard";
 
 export const GameContextProvider = ({ children }: { children: ReactNode }) => {
     const [numberOfPlayers, setNumberOfPlayers] = useState<number | null>(null)
@@ -21,7 +21,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         if (!game) return
         console.log(`Applying move with a ${card.value}_${card.suit} card`)
         const newState = makeMove(game, card)
-        setGame(newState)
+        if(newState)setGame(newState)
         console.log("State was updated.")
     }
 
@@ -29,7 +29,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         if (!game) return
         console.log("Applying pass")
         const newState = makePass(game)
-        setGame(newState)
+        if(newState)setGame(newState)
         console.log("State was updated.")
     }
 
@@ -41,13 +41,13 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
                 if (validCard) {
                     console.log(`Applying move with a ${validCard.value}_${validCard.suit} card`)
                     const newState = makeMove(game, validCard)
-                    setGame(newState)
+                    if(newState)setGame(newState)
                     console.log("State was updated.")
                 }
                 else {
                     console.log("Applying pass")
                     const newState = makePass(game)
-                    setGame(newState)
+                    if(newState)setGame(newState)
                     console.log("State was updated.")
                 }
             }, 3500);

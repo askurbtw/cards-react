@@ -1,4 +1,4 @@
-import type { Card, Deck, DeckCard } from "../types"
+import type { Card, Deck, DeckCard } from "@shared/types"
 import { useMemo } from "react";
 import CardsContainerComponent from "./CardsContainerComponent";
 import { DeckComponent } from "./DeckComponent";

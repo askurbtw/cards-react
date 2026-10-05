@@ -1,6 +1,6 @@
-import HomePage from './pages/HomePage'
-import GamePage from './pages/GamePage'
-import { GameContextProvider } from './context/GameContextProvider'
+import HomePage from './client/pages/HomePage'
+import GamePage from './client/pages/GamePage'
+import { GameContextProvider } from './client/context/GameContextProvider'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 const router = createBrowserRouter([{
   path: '/',

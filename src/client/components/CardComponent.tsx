@@ -1,5 +1,5 @@
 import React, {  forwardRef } from "react";
-import type { Card } from "../types";
+import type { Card } from "@shared/types";
 
 
 

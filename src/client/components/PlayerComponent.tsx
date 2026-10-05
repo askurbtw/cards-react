@@ -1,9 +1,9 @@
 import type React from "react"
-import type {  Card, Player } from "../types"
+import type {  Card, Player } from "@shared/types"
 import { CardComponent } from "./CardComponent"
 import { useRef, useState } from "react";
 import { useGame } from "../context/GameContext";
-import checkValidCard from "../gameLogic/checkValidCard";
+import checkValidCard from "@shared/gameLogic/checkValidCard"
 
 
 interface PlayerComponentProps {
