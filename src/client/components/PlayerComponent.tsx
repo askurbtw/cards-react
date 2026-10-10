@@ -3,7 +3,7 @@ import type {  Card, Player } from "@shared/types"
 import { CardComponent } from "./CardComponent"
 import { useRef, useState } from "react";
 import { useGame } from "../context/GameContext";
-import checkValidCard from "@shared/gameLogic/checkValidCard"
+
 
 
 interface PlayerComponentProps {
@@ -16,19 +16,10 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
     const {game, applyMove, applyPass } = useGame()
     const cardEls = useRef(new Map<string, HTMLLIElement>()).current;
     const count = playerInfo.cards.length
-    const handleClick = (card:Card, cardRef:HTMLLIElement | undefined)=>{
-        console.log(card)
-        console.log(game?.currentId)
+    const handleClick = async (card:Card, cardRef:HTMLLIElement | undefined)=>{
         if(game?.currentId === playerInfo.id && cardRef){
-            console.log("Card clicked")
-            const moveType = game.attackerId === playerInfo.id?"attack":"defence"
-            if(checkValidCard(card,game.currentCards,moveType,game.movesCounter,game.deck.trump)){
-
-                console.log("Valid")
-                applyMove(card)
-            }
-            else{
-                console.log("Card is invalid.")
+            const result = await applyMove(card)
+            if(result === 'Invalid move.'){
                 setInvalidCardId(card.id)
                 setTimeout(() => {
                     setInvalidCardId(null)
@@ -52,7 +43,7 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
             <ul style={{ '--count': count } as React.CSSProperties}>
                 {playerInfo.cards.map((card, index) => {
                     return (
-                        <CardComponent key={`${card.value} - ${card.suit}`} card={card} index={index} onClick = {playerInfo.id===0?()=>handleClick(card,cardEls.get(card.id)):undefined} playerIndex={playerInfo.id} isInvalid={card.id===invalidCardId?true:null}  ref={(node) => {
+                        <CardComponent key={`${playerInfo.id} - ${index}`} card={card} index={index} onClick = {playerInfo.id===0?()=>handleClick(card,cardEls.get(card.id)):undefined} playerIndex={playerInfo.id} isInvalid={card.id===invalidCardId?true:null}  ref={(node) => {
                             if (node) {
                                 cardEls.set(card.id, node)
                             }

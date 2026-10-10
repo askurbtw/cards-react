@@ -7,7 +7,7 @@ const router = createBrowserRouter([{
   element: <HomePage />
 },
 {
-  path: '/GamePage',
+  path: '/GamePage/:roomId',
   element: <GamePage />
 }])
 function App() {

@@ -1,4 +1,4 @@
-import type { Card, Deck, DeckCard } from "@shared/types"
+import type {  Deck, DeckCard } from "@shared/types"
 import { useMemo } from "react";
 import CardsContainerComponent from "./CardsContainerComponent";
 import { DeckComponent } from "./DeckComponent";
@@ -7,7 +7,7 @@ interface TableComponentProps {
     deck: Deck;
     text: string;
     currentCards: DeckCard[];
-    leftovers: Array<Card>
+    leftovers: number
 }
 
 
@@ -46,7 +46,7 @@ export default function TableComponent({ deck, text, currentCards, leftovers }: 
                     <div id="deck-part-of-field">
                         <DeckComponent deck={deck} />
                         <div id="leftovers">
-                            {leftovers.map((_, index) => {
+                            {[...Array(leftovers)].map((_, index) => {
                                 return <div className="deck-card" key={`${index} `} style={{ '--i': index } as React.CSSProperties}>
                                     <img src="/images/cards/reverse_card.svg" alt="" />
                                 </div>

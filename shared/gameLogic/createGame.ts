@@ -1,6 +1,6 @@
-import { type GameState } from "../types";
-import createDeck from "./createDeck";
-import { initializePlayers } from "./initializePlayers";
+import { type GameState } from "../types/index.ts";
+import createDeck from "./createDeck.ts";
+import { initializePlayers } from "./initializePlayers.ts";
 export default function createGame(numberOfPlayers:number, playerName:string) : GameState  {
     const deck = createDeck()
     const [players, newDeck] = initializePlayers(numberOfPlayers, playerName, deck)

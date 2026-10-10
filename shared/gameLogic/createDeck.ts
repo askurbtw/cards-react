@@ -1,7 +1,7 @@
 
-import {type Card, type Deck, ALL_SUITS, ALL_VALUES} from '../types'
-import shuffleCards from '../utils/shuffleCards';
-import createTrump from './createTrump';
+import {type Card, type Deck, ALL_SUITS, ALL_VALUES} from '../types/index.ts'
+import shuffleCards from '../utils/shuffleCards.ts';
+import createTrump from './createTrump.ts';
 
 export default function createDeck(): Deck{
     const cards : Card[] = []

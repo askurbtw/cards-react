@@ -1,4 +1,4 @@
-import {  Navigate } from 'react-router-dom'
+import {  Navigate  } from 'react-router-dom'
 import { useGame } from '../context/GameContext'
 import '../../style.css'
 import PlayerComponent from '../components/PlayerComponent'
@@ -6,7 +6,9 @@ import TableComponent from '../components/TableComponent'
 import getPlayer from '@shared/utils/getPlayer'
 
 export default function GamePage() {
-    const { game } = useGame()
+    const {game} = useGame()
+    
+    
     if (!game) {
         return <Navigate to='/' replace />
     }

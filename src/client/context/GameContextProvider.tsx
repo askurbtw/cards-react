@@ -1,60 +1,99 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { type ReactNode } from "react";
 import { GameContext } from "./GameContext";
-import type { Card, GameState, } from "@shared/types";
-import createGame from "@shared/gameLogic/createGame";
-import makeMove from "@shared/gameLogic/makeMove";
-import makePass from "@shared/gameLogic/makePass";
-import botFindValidCard from "@shared/gameLogic/botFindValidCard";
+import type { Card, GameView  } from "@shared/types";
+import customDelay from "@shared/utils/customDelay";
+
+
 
 export const GameContextProvider = ({ children }: { children: ReactNode }) => {
     const [numberOfPlayers, setNumberOfPlayers] = useState<number | null>(null)
     const [playerName, setPlayerName] = useState<string | null>(null)
-    const [game, setGame] = useState<GameState | null>(null)
+    const [game, setGame] = useState<GameView | null>(null)
+    const [token, setToken] = useState<string>('')
 
-    const startGame = (numberOfPlayers: number, playerName: string) => {
+    const startGame = async (numberOfPlayers: number, playerName: string): Promise<string> => {
         setNumberOfPlayers(numberOfPlayers)
         setPlayerName(playerName)
-        setGame(createGame(numberOfPlayers, playerName))
-    }
-    const applyMove = (card: Card) => {
-        if (!game) return
-        console.log(`Applying move with a ${card.value}_${card.suit} card`)
-        const newState = makeMove(game, card)
-        if(newState)setGame(newState)
-        console.log("State was updated.")
-    }
-
-    const applyPass = () => {
-        if (!game) return
-        console.log("Applying pass")
-        const newState = makePass(game)
-        if(newState)setGame(newState)
-        console.log("State was updated.")
-    }
-
-    useEffect(() => {
-        if (game?.currentId != 0 && game) {
-            console.log("Bot Move")
-            setTimeout(() => {
-                const validCard = botFindValidCard(game)
-                if (validCard) {
-                    console.log(`Applying move with a ${validCard.value}_${validCard.suit} card`)
-                    const newState = makeMove(game, validCard)
-                    if(newState)setGame(newState)
-                    console.log("State was updated.")
-                }
-                else {
-                    console.log("Applying pass")
-                    const newState = makePass(game)
-                    if(newState)setGame(newState)
-                    console.log("State was updated.")
-                }
-            }, 3500);
+        const response = await fetch('/routes/create/room',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                numberOfPlayers,
+                playerName
+            })
+        })
+        if(!response.ok){
+            throw new Error('Server error')
         }
-        return
-    }, [game])
+        const data = await response.json();
+        
+        setGame(data.state)
+        setToken(data.token)
+        console.log(data)
+        return data.roomId
 
+    }
+    const applyMove = async (card: Card) : Promise<string> => {
+        if (!game) return 'Game is not defined.'
+        const response = await fetch(`/routes/apply/move/${game.roomId}`,
+            {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                    Authorization: token
+                },
+                body:JSON.stringify({cardId:card.id})
+            }
+        )
+        
+        const rawString : string= await response.text()
+        const data = JSON.parse(rawString)
+        if(!response.ok){
+            return data.error
+        }
+        const stateHistory : GameView [] = data.stateHistory
+        console.log(stateHistory.length)
+        for(let i = 0;i<stateHistory.length;i++){
+            if(i>0){
+                await customDelay(3000)
+            }
+            setGame(stateHistory[i])
+        }
+        
+        return 'Success.'
+    }
+
+    const applyPass = async () => {
+        if (!game) return 'Game is not defined.'
+        const response = await fetch(`/routes/apply/pass/${game.roomId}`,
+            {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                    Authorization: token
+                },
+            }
+        )
+        const rawString : string= await response.text()
+        const data = JSON.parse(rawString)
+        if(!response.ok){
+            return data.error
+        }
+        const stateHistory : GameView [] = data.stateHistory
+        console.log(stateHistory.length)
+        for(let i = 0;i<stateHistory.length;i++){
+            if(i>0){
+                await customDelay(3000)
+            }
+            setGame(stateHistory[i])
+        }
+        
+        return 'Success.'
+        
+    }
 
     const contextValue = {
         numberOfPlayers,
@@ -63,7 +102,6 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         startGame,
         applyMove,
         applyPass,
-        
         
     }
     return (

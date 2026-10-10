@@ -1,4 +1,4 @@
-import type { Card } from "../types";
+import type { Card } from "../types/index.ts";
 
 export default function createTrump(cards:Card[]): Card | null{
     if (!cards || cards.length === 0) {

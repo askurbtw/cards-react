@@ -1,14 +1,15 @@
-import type { Card } from "./card.types";
-import type { GameState } from "./gamestate.types";
+import type { Card } from "./card.types.ts";
+import type { GameView } from "./gameView.types.ts";
+
 
 
 export interface GameContextType {
     numberOfPlayers: number | null;
     playerName:string | null;
-    game: GameState | null;
-    startGame: (numberOfPlayers: number, playerName: string) => void;
-    applyMove: ( card:Card) => void;
-    applyPass: () => void;
+    game: GameView | null;
+    startGame: (numberOfPlayers: number, playerName: string) => Promise<string>;
+    applyMove: ( card:Card) => Promise<string>;
+    applyPass: () => Promise<string>;
     
     
 }

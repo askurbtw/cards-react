@@ -1,6 +1,6 @@
 
-import { type Deck, type Player } from "../types";
-import { initializePlayerCard } from "./initializePlayerCard";
+import { type Deck, type Player } from "../types/index.ts";
+import { initializePlayerCard } from "./initializePlayerCard.ts";
 
 
 

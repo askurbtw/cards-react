@@ -1,7 +1,7 @@
-import type { Card } from "./card.types";
-import type { Deck } from "./deck.types";
-import type { DeckCard } from "./deckcard.types";
-import type { Player } from "./player.types";
+import type { Card } from "./card.types.ts";
+import type { Deck } from "./deck.types.ts";
+import type { DeckCard } from "./deckcard.types.ts";
+import type { Player } from "./player.types.ts";
 
 export type GameState = {
   players: Player[];

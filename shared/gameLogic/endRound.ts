@@ -1,10 +1,10 @@
-import type { GameState } from "../types";
+import type { GameState } from "../types/index.ts";
 
-import addCards from "./addCards";
-import findNextPlayers from "./findNextPlayers";
-import tableToDefender from "./tableToDefender";
-import tableToLeftovers from "./tableToLeftovers";
-import updateFinishOrder from "./updateFinishOrder";
+import addCards from "./addCards.ts";
+import findNextPlayers from "./findNextPlayers.ts";
+import tableToDefender from "./tableToDefender.ts";
+import tableToLeftovers from "./tableToLeftovers.ts";
+import updateFinishOrder from "./updateFinishOrder.ts";
 
 export default function endRound(state:GameState, deffPass:boolean) : GameState {
     const newStateFunction = deffPass?()=>tableToDefender(state):()=>tableToLeftovers(state)

@@ -1,4 +1,4 @@
-import type { GameState } from "../types";
+import type { GameState } from "../types/index.ts";
 
 export default function addCards(state: GameState): GameState {
   if (state.deck.cards.length > 0) {

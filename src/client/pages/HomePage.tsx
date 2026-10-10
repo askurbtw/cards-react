@@ -16,7 +16,7 @@ export default function HomePage() {
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setNumberOfPlayers(Number(event.target.value))
     }
-    const handleClick = () => {
+    const handleClick = async () => {
         if (!numberOfPlayers) {
             alert(`Number of players was not selected.`)
             return
@@ -25,8 +25,8 @@ export default function HomePage() {
             alert(`Player name was not assigned.`)
             return
         }
-        startGame(numberOfPlayers,playerName)
-        navigate('/GamePage')
+        const roomId = await startGame(numberOfPlayers,playerName)
+        navigate(`/GamePage/${roomId}` )
 
     }
     return (

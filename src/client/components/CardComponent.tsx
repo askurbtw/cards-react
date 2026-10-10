@@ -18,7 +18,7 @@ export const CardComponent = forwardRef<HTMLLIElement, CardProps>(
             <div className={`the-card ${playerIndex===0?"card-flipped":null}
                 ${isInvalid?"invalid-card":null}`} onClick={onClick}>
                 <img src="/images/cards/reverse_card.svg" className="the-front" />
-                <img src={`/images/cards/${card.value}_of_${card.suit}.svg`} className="the-back"  />
+                {playerIndex===0 &&<img src={`/images/cards/${card.value}_of_${card.suit}.svg`} className="the-back"  />}
             </div>
         </li>
     )

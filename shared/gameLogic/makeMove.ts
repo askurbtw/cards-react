@@ -1,5 +1,5 @@
-import type { Card, GameState } from "../types";
-import getPlayer from "../utils/getPlayer";
+import type { Card, GameState } from "../types/index.ts";
+import getPlayer from "../utils/getPlayer.ts";
 
 export default function makeMove(
   state: GameState,
