@@ -446,14 +446,9 @@ header ul{
 }
 
 #header-li li{
-    color:#2F2F2F;
+    
     list-style: none;
-    text-align: center;
-    font-weight: 700;
-    background-color: #83FF3B;
-    padding: 0 20px;
-    border-radius: 10px;
-    border: solid 2px;
+    
     
 }
 #header-li h2{
@@ -500,20 +495,20 @@ nav {
 }
 #game-launch{
     background-color: antiquewhite;
-    border:solid 3px #83FF3B;
+    
     border-radius: 10px;
     display: flex;
     justify-content: center;
     padding:50px
 }
-#start-game{
+.game-btn{
     background-color: #83FF3B;
     border-radius: 5px;
     border: solid 2px;
     padding:20px;
     font-weight: bold;
 }
-#name-input{
+.name-input{
     outline: none;
     background-color:rgb(251, 207, 48);
     border:solid 2px;
@@ -522,16 +517,16 @@ nav {
     font-weight: bold;
     color: #2D2D2D;
 }
-#name-input::placeholder{
+.name-input::placeholder{
     color:#2D2D2D;
     font-weight: bold;
     text-align: center;
     transition: color 0.1s ease;
 }
-#name-input:focus{
+.name-input:focus{
     border:solid 2px #83FF3B !important
 }
-#name-input:focus::placeholder{
+.name-input:focus::placeholder{
     color:transparent
 }
 

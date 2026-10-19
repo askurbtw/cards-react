@@ -86,7 +86,7 @@ nav {
     justify-content: center;
     padding:50px
 }
-#start-game{
+.game-btn li button{
     background-color: #83FF3B;
     border-radius: 5px;
     border: solid 2px;

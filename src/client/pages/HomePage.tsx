@@ -1,33 +1,19 @@
-
 import {  useState } from "react";
-import { useGame } from "../context/GameContext";
-import { useNavigate } from "react-router-dom";
+import SinglePlayerPage from "./SinglePlayerPage";
+import MultiPlayerPage from "./MultiPlayerPage";
 
 
 
 export default function HomePage() {
-    const {startGame} = useGame()
-    const navigate = useNavigate()
-    const [numberOfPlayers, setNumberOfPlayers]=useState<number | null >(null)
-    const [playerName, setPlayerName] = useState<string>('')
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPlayerName(String(event.target.value))
+    const [mode,setMode] = useState<string>('single')
+    
+    const singlePlayerClick = ()=>{
+        if(mode!=='single')
+        setMode('single')
     }
-    const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setNumberOfPlayers(Number(event.target.value))
-    }
-    const handleClick = async () => {
-        if (!numberOfPlayers) {
-            alert(`Number of players was not selected.`)
-            return
-        }
-        if(!playerName){
-            alert(`Player name was not assigned.`)
-            return
-        }
-        const roomId = await startGame(numberOfPlayers,playerName)
-        navigate(`/GamePage/${roomId}` )
-
+    const multiplayerClick = ()=>{
+        if(mode!=='multiplayer')
+        setMode('multiplayer')
     }
     return (
         <>
@@ -36,29 +22,13 @@ export default function HomePage() {
                     <nav>
                         <div id="header-li">
                             <ul>
-                                <li><h2>Single Player</h2></li>
-                                <li><h2>Multiplayer</h2></li>
+                                <li><button className="game-btn" onClick={singlePlayerClick}>Single Player</button></li>
+                                <li><button className="game-btn" onClick={multiplayerClick}>Multiplayer</button></li>
                             </ul>
                         </div>
                     </nav>
                 </header>
-                <div id="game-settings">
-                    <div id="name-div"><input id="name-input" onChange={handleInputChange} placeholder="Enter your name..." /></div>
-                    <div id="select-div">
-                        <label htmlFor="players-select" id="players-label"
-                        >Select number of players
-                        </label>
-                        <select name="players-select" id="players-select" onChange={handleSelectChange} defaultValue={""}>
-                            <option value="" disabled>Players</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="game-launch">
-                    <button id="start-game" onClick={handleClick}>Start Game</button>
-                </div>
+                {mode==='single'?<SinglePlayerPage/>:<MultiPlayerPage/>}
             </div>
         </>
     )
