@@ -3,12 +3,12 @@ import { useGame } from "../context/GameContext"
 import { useState } from "react"
 
 export default function MultiPlayerPage(): React.JSX.Element {
-    const { startGame } = useGame()
+    const { startGame, joinGame } = useGame()
     const navigate = useNavigate()
     const [numberOfPlayers, setNumberOfPlayers] = useState<number | null>(null)
     const [playerName, setPlayerName] = useState<string>('')
     const [type, setType] = useState<string>('')
-    const [roomId, setRoomId] = useState<string>('')
+    const [joinRoomId, setJoinRoomId] = useState<string>('')
     const handleNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPlayerName(String(event.target.value))
     }
@@ -16,9 +16,9 @@ export default function MultiPlayerPage(): React.JSX.Element {
         setNumberOfPlayers(Number(event.target.value))
     }
     const handleRoomInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRoomId(event.target.value)
+        setJoinRoomId(String(event.target.value))
     }
-    const handleClick = async () => {
+    const handleCreateClick = async () => {
         if (!numberOfPlayers) {
             alert(`Number of players was not selected.`)
             return
@@ -34,11 +34,21 @@ export default function MultiPlayerPage(): React.JSX.Element {
     const handleTypeClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         const typeSelected = event.currentTarget.textContent
         if (type === typeSelected) return
-        const parsedType = typeSelected==='Join Game'?'join':'create'
+        const parsedType = typeSelected === 'Join Game' ? 'join' : 'create'
         setType(parsedType)
     }
-    const handleJoinClick = async ()=>{
-        return
+    const handleJoinClick = async () => {
+        if (!playerName) {
+            alert(`Player name was not assigned.`)
+            return
+        }
+        if (!joinRoomId) {
+            alert(`Room id was not assigned.`)
+            return
+        }
+        const roomId = await joinGame(playerName, joinRoomId)
+        navigate(`/GamePage/${roomId}`)
+
     }
     return (
         <div>
@@ -62,7 +72,7 @@ export default function MultiPlayerPage(): React.JSX.Element {
                             </select>
                         </div>
                         <div id="game-launch">
-                            <button className="game-btn" onClick={handleClick}>Start Game</button>
+                            <button className="game-btn" onClick={handleCreateClick}>Start Game</button>
                         </div>
                     </div> :
                     type === 'join' ?
@@ -72,7 +82,7 @@ export default function MultiPlayerPage(): React.JSX.Element {
                                 <button className="game-btn" onClick={handleJoinClick}>Join</button>
                             </div>
                         </div>
-                    : null
+                        : null
                 }
 
             </div>

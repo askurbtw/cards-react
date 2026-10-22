@@ -14,14 +14,17 @@ import checkValidCard from "../shared/gameLogic/checkValidCard.ts";
 import makeMove from "../shared/gameLogic/makeMove.ts";
 import botFindValidCard from "../shared/gameLogic/botFindValidCard.ts";
 import makePass from "../shared/gameLogic/makePass.ts";
+import { initializePlayer } from "../shared/gameLogic/initializePlayer.ts";
+import type JoinRoomRequest from "../shared/types/joinrequesttype.types.ts";
 
 
 
 const PORT = 8000;
-type allowedTypes = CreateRoomRequest | MoveRequest;
+type allowedTypes = CreateRoomRequest | MoveRequest | JoinRoomRequest;
 const rooms: Map<string, Room> = new Map();
 const applyMovePattern = /^\/routes\/apply\/move\/([^/]+)$/;
-const applyPassPattern = /^\/routes\/apply\/pass\/([^/]+)$/
+const applyPassPattern = /^\/routes\/apply\/pass\/([^/]+)$/;
+const joinRoomPattern = /^\/routes\/join\/room\/([^/]+)$/
 
 const getData = async <T extends allowedTypes>(
   req: IncomingMessage,
@@ -124,6 +127,7 @@ const gameView = (state: GameState, roomId:string): GameView => {
     trump: state.deck.trump,
   };
   return {
+    numberOfPlayers:state.numberOfPlayers,
     players: playersForView,
     deck: deckForView,
     currentCards: state.currentCards,
@@ -134,7 +138,8 @@ const gameView = (state: GameState, roomId:string): GameView => {
     disablePassButton: state.disablePassButton,
     status: state.status,
     roomId,
-    finishOrder: state.finishOrder
+    finishOrder: state.finishOrder,
+    playersOnline:state.playersOnline
   };
 };
 
@@ -155,6 +160,7 @@ const server = http.createServer(
         state,
         tokens: new Map([[playerToken, 0]]),
       };
+
       const response = {
         roomId,
         state: gameView(state, roomId),
@@ -239,6 +245,27 @@ const server = http.createServer(
       res.end(JSON.stringify(response))
       return
 
+    }
+    if (req.method === "POST" && joinRoomPattern.test(req.url)) {
+      const room = getRoom(req, joinRoomPattern)
+      if(!room){
+        res.writeHead(409, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Conflict" }));
+        return;
+      }
+      const data = await getData<JoinRoomRequest>(req)
+      const playerToken = randomUUID();
+      room.state.playersOnline+=1
+      const player: Player = initializePlayer(data.playerName, room.state.players.length)
+      room.state.players.push(player)
+      const response = {
+        roomId:room.roomId,
+        state: gameView(room.state, room.roomId),
+        token: playerToken
+      };
+      res.writeHead(201, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(response));
+      return
     }
   },
 );

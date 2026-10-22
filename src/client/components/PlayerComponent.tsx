@@ -17,6 +17,7 @@ export default function PlayerComponent({ playerInfo }: PlayerComponentProps) {
     const cardEls = useRef(new Map<string, HTMLLIElement>()).current;
     const count = playerInfo.cards.length
     const handleClick = async (card:Card, cardRef:HTMLLIElement | undefined)=>{
+        if(game?.status==='waiting for players') return
         if(game?.currentId === playerInfo.id && cardRef){
             const result = await applyMove(card)
             if(result === 'Invalid move.'){

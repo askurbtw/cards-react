@@ -1,4 +1,4 @@
-import {  Navigate  } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useGame } from '../context/GameContext'
 import '../../style.css'
 import PlayerComponent from '../components/PlayerComponent'
@@ -6,36 +6,37 @@ import TableComponent from '../components/TableComponent'
 import getPlayer from '@shared/utils/getPlayer'
 
 export default function GamePage() {
-    const {game} = useGame()
-    
-    
+    const { game } = useGame()
+
+
     if (!game) {
         return <Navigate to='/' replace />
     }
-    
-    const current = getPlayer(game.players, game.currentId)
-    const attacker = getPlayer(game.players, game.attackerId)
-    const defender = getPlayer(game.players, game.defenderId)
+    const gameText = game.status !== "waiting for players" ? `Waiting for ${game.numberOfPlayers - game.playersOnline} more players` :
+        game.currentId && game.attackerId && game.defenderId ? game.currentId === game.attackerId
+            ? `${getPlayer(game.players, game.attackerId).name}'s turn against ${getPlayer(game.players, game.defenderId).name}`
+            : `${getPlayer(game.players, game.currentId).name}'s turn`
+            : ''
 
-    const gameText = game.currentId === game.attackerId
-        ? `${attacker.name}'s turn against ${defender.name}`
-        : `${current.name}'s turn`
-    
-    if(game.status==="finished"){
+    if (game.status === "finished") {
         return (
             <>
-            <h1>{`Winner is: ${game.finishOrder[0]}`}</h1>
-            <h2>Finish order</h2>
-            <ol>
-                {game.finishOrder.map((player)=>{
-                    return (
-                        <li>{getPlayer(game.players,player).name}</li>
-                    )
-                })}
-            </ol>
+                <h1>{`Winner is: ${game.finishOrder[0]}`}</h1>
+                <h2>Finish order</h2>
+                <ol>
+                    {game.finishOrder.map((player) => {
+                        return (
+                            <li>{getPlayer(game.players, player).name}</li>
+                        )
+                    })}
+                </ol>
             </>
         )
     }
+
+
+
+
     return (<>
         <div>
             <div id="game-grid">

@@ -36,6 +36,30 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         return data.roomId
 
     }
+    const joinGame = async (playerName: string,roomID:string): Promise<string> => {
+        setNumberOfPlayers(numberOfPlayers)
+        setPlayerName(playerName)
+        const response = await fetch(`/routes/join/room/${roomID}`,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                playerName
+            })
+        })
+        if(!response.ok){
+            throw new Error('Server error')
+        }
+        const data = await response.json();
+        
+        setGame(data.state)
+        setToken(data.token)
+        console.log(data)
+        return data.roomId
+
+    }
+    
     const applyMove = async (card: Card) : Promise<string> => {
         if (!game) return 'Game is not defined.'
         const response = await fetch(`/routes/apply/move/${game.roomId}`,
@@ -100,6 +124,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         playerName,
         game,
         startGame,
+        joinGame,
         applyMove,
         applyPass,
         
