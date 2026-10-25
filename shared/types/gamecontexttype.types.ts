@@ -9,8 +9,8 @@ export interface GameContextType {
     game: GameView | null;
     startGame: (numberOfPlayers: number, playerName: string) => Promise<string>;
     joinGame: (playerName:string, roomID:string) => Promise<string>;
-    applyMove: ( card:Card) => Promise<string>;
-    applyPass: () => Promise<string>;
+    applyMove: ( card:Card) => string;
+    applyPass: () => string;
     token:string;
     myPlayerId:number
     

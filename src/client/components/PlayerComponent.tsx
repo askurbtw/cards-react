@@ -20,7 +20,7 @@ export default function PlayerComponent({ index,playerInfo }: PlayerComponentPro
     const handleClick = async (card:Card, cardRef:HTMLLIElement | undefined)=>{
         if(game?.status==='waiting for players') return
         if(game?.currentId === playerInfo.id && cardRef){
-            const result = await applyMove(card)
+            const result = applyMove(card)
             if(result === 'Invalid move.'){
                 setInvalidCardId(card.id)
                 setTimeout(() => {
@@ -42,6 +42,7 @@ export default function PlayerComponent({ index,playerInfo }: PlayerComponentPro
 
     return (
         <div id={`player-${index+1}`} className="hand">
+            <h6>{playerInfo.name}</h6>
             <ul style={{ '--count': count } as React.CSSProperties}>
                 {playerInfo.cards.map((card, index) => {
                     return (

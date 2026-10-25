@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { type ReactNode } from "react";
 import { GameContext } from "./GameContext";
 import type { Card, GameView  } from "@shared/types";
-import customDelay from "@shared/utils/customDelay";
+
 import { useSocket } from "./SocketContext";
+import type SocketResponse from "@shared/types/socketresponse.types";
 
 
 
@@ -21,8 +22,8 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         if(!socket) return
         socket.on("broadcast", (newState: GameView)=>{
             console.log("player joined")
-            const myIndex = newState.players.findIndex(player=>player.cards[0].value!=0)
-            const players = [...newState.players.slice(myIndex), ...newState.players.slice(0,myIndex)]
+            
+            const players = [...newState.players.slice(myPlayerId), ...newState.players.slice(0,myPlayerId)]
             newState.players=players
             setMyPlayerId(players[0].id)
             console.log(newState)
@@ -33,7 +34,9 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             console.log(newState)
             setGame(newState)
         })
-    },[socket])
+
+        
+    },[socket, myPlayerId])
     const startGame = async (numberOfPlayers: number, playerName: string): Promise<string> => {
         setNumberOfPlayers(numberOfPlayers)
         setPlayerName(playerName)
@@ -55,6 +58,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         makeHandshake(data.roomId)
         setGame(data.state)
         setToken(data.token)
+        setMyPlayerId(data.state.players[data.state.players.length-1].id)
         console.log(data)
         
         return data.roomId
@@ -79,66 +83,32 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         makeHandshake(data.roomId)
         setGame(data.state)
         setToken(data.token)
+        setMyPlayerId(data.state.players[data.state.players.length-1].id)
         console.log(data)
         return data.roomId
 
     }
     
-    const applyMove = async (card: Card) : Promise<string> => {
-        if (!game) return 'Game is not defined.'
-        const response = await fetch(`/routes/apply/move/${game.roomId}`,
-            {
-                method:'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                    Authorization: token
-                },
-                body:JSON.stringify({cardId:card.id})
+    const applyMove =  (card: Card) : string => {
+        if (!game || !socket) return 'Game or socket is not defined.'
+        socket.emit("make_move", card.id, (response:SocketResponse)=>{
+            if(response && response.error){
+                console.log(response.error)
+                return response.error
             }
-        )
-        
-        const rawString : string= await response.text()
-        const data = JSON.parse(rawString)
-        if(!response.ok){
-            return data.error
-        }
-        const stateHistory : GameView [] = data.stateHistory
-        console.log(stateHistory.length)
-        for(let i = 0;i<stateHistory.length;i++){
-            if(i>0){
-                await customDelay(3000)
-            }
-            setGame(stateHistory[i])
-        }
+        })
         
         return 'Success.'
     }
 
-    const applyPass = async () => {
-        if (!game) return 'Game is not defined.'
-        const response = await fetch(`/routes/apply/pass/${game.roomId}`,
-            {
-                method:'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                    Authorization: token
-                },
+    const applyPass =  () : string=> {
+        if (!game || !socket) return 'Game or socket is not defined.'
+        socket.emit("make_pass", (response:SocketResponse)=>{
+            if(response && response.error){
+                console.log(response.error)
+                return response.error
             }
-        )
-        const rawString : string= await response.text()
-        const data = JSON.parse(rawString)
-        if(!response.ok){
-            return data.error
-        }
-        const stateHistory : GameView [] = data.stateHistory
-        console.log(stateHistory.length)
-        for(let i = 0;i<stateHistory.length;i++){
-            if(i>0){
-                await customDelay(3000)
-            }
-            setGame(stateHistory[i])
-        }
-        
+        })
         return 'Success.'
         
     }

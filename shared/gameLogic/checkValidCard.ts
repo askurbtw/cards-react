@@ -7,7 +7,10 @@ export default function checkValidCard(
   moveType: string,
   
 ) : {isCardValid : boolean, card:Card | null}{
-  const player = state.players[state.currentId]
+  const player = state.players.find(player=>player.id===state.currentId)
+  if(!player){
+    return {isCardValid: false, card: null};
+  }
   const cardToCheck = player.cards.find((card)=>card.id === cardIdToCheck)
   const currentCards = state.currentCards
   const trumpCard = state.deck.trump
