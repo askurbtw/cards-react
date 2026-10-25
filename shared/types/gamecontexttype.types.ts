@@ -11,6 +11,8 @@ export interface GameContextType {
     joinGame: (playerName:string, roomID:string) => Promise<string>;
     applyMove: ( card:Card) => Promise<string>;
     applyPass: () => Promise<string>;
+    token:string;
+    myPlayerId:number
     
     
 }

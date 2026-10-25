@@ -9,9 +9,9 @@ export type GameState = {
   deck: Deck;
   playersOnline: number,
   currentCards: DeckCard[];
-  attackerId: number | undefined;
-  defenderId: number | undefined;
-  currentId: number | undefined;
+  attackerId: number ;
+  defenderId: number ;
+  currentId: number ;
   leftovers: Card[];
   movesCounter: number;
   disablePassButton: boolean;

@@ -4,20 +4,30 @@ import '../../style.css'
 import PlayerComponent from '../components/PlayerComponent'
 import TableComponent from '../components/TableComponent'
 import getPlayer from '@shared/utils/getPlayer'
+import { useSocket } from '../context/SocketContext'
+import { useEffect } from 'react'
 
 export default function GamePage() {
     const { game } = useGame()
-
-
+    const {socket} = useSocket()
+    const {token} = useGame()
+    useEffect(()=>{
+        return () =>{
+            if(socket && socket.connected){
+                console.log("leaving")
+                socket.emit("player_left", token)
+            }
+        }
+    }, [socket,token])
     if (!game) {
         return <Navigate to='/' replace />
     }
-    const gameText = game.status !== "waiting for players" ? `Waiting for ${game.numberOfPlayers - game.playersOnline} more players` :
-        game.currentId && game.attackerId && game.defenderId ? game.currentId === game.attackerId
+    const gameText = game.status === "waiting for players" ? `Waiting for ${game.numberOfPlayers - game.playersOnline} more players` :
+        game.currentId!==undefined && game.attackerId!==undefined && game.defenderId!==undefined ? game.currentId === game.attackerId
             ? `${getPlayer(game.players, game.attackerId).name}'s turn against ${getPlayer(game.players, game.defenderId).name}`
             : `${getPlayer(game.players, game.currentId).name}'s turn`
             : ''
-
+    console.log(gameText)
     if (game.status === "finished") {
         return (
             <>
@@ -40,8 +50,8 @@ export default function GamePage() {
     return (<>
         <div>
             <div id="game-grid">
-                {game.players.map((player) => {
-                    return <PlayerComponent key={player.id} playerInfo={player} />
+                {game.players.map((player, index) => {
+                    return <PlayerComponent key={player.id} playerInfo={player} index={index} />
                 })}
                 <div id="cards-field">
                     <TableComponent deck={game.deck} text={gameText} currentCards={game.currentCards} leftovers={game.leftovers} />

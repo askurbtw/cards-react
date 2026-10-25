@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type ReactNode } from "react";
 import { GameContext } from "./GameContext";
 import type { Card, GameView  } from "@shared/types";
 import customDelay from "@shared/utils/customDelay";
+import { useSocket } from "./SocketContext";
+
 
 
 
@@ -11,7 +13,27 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
     const [playerName, setPlayerName] = useState<string | null>(null)
     const [game, setGame] = useState<GameView | null>(null)
     const [token, setToken] = useState<string>('')
+    const [myPlayerId, setMyPlayerId] = useState<number>(0)
+    const {socket, makeHandshake} = useSocket()
 
+
+    useEffect(()=>{
+        if(!socket) return
+        socket.on("broadcast", (newState: GameView)=>{
+            console.log("player joined")
+            const myIndex = newState.players.findIndex(player=>player.cards[0].value!=0)
+            const players = [...newState.players.slice(myIndex), ...newState.players.slice(0,myIndex)]
+            newState.players=players
+            setMyPlayerId(players[0].id)
+            console.log(newState)
+            setGame(newState)
+        })
+        socket.on("update_game", (newState: GameView)=>{
+            console.log("player joined")
+            console.log(newState)
+            setGame(newState)
+        })
+    },[socket])
     const startGame = async (numberOfPlayers: number, playerName: string): Promise<string> => {
         setNumberOfPlayers(numberOfPlayers)
         setPlayerName(playerName)
@@ -28,11 +50,13 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         if(!response.ok){
             throw new Error('Server error')
         }
-        const data = await response.json();
         
+        const data = await response.json();
+        makeHandshake(data.roomId)
         setGame(data.state)
         setToken(data.token)
         console.log(data)
+        
         return data.roomId
 
     }
@@ -52,7 +76,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             throw new Error('Server error')
         }
         const data = await response.json();
-        
+        makeHandshake(data.roomId)
         setGame(data.state)
         setToken(data.token)
         console.log(data)
@@ -127,6 +151,8 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         joinGame,
         applyMove,
         applyPass,
+        token,
+        myPlayerId
         
     }
     return (

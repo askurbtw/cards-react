@@ -16,7 +16,8 @@ import botFindValidCard from "../shared/gameLogic/botFindValidCard.ts";
 import makePass from "../shared/gameLogic/makePass.ts";
 import { initializePlayer } from "../shared/gameLogic/initializePlayer.ts";
 import type JoinRoomRequest from "../shared/types/joinrequesttype.types.ts";
-
+import {Server} from 'socket.io'
+import { initializePlayers } from "../shared/gameLogic/initializePlayers.ts";
 
 
 const PORT = 8000;
@@ -63,6 +64,21 @@ const verifyPlayer = (
   return validPlayer
 }
 
+const startGame = (state:GameState) : GameState => {
+  const newState = initializePlayers(state)
+  const attackerId = Math.floor(Math.random() * newState.numberOfPlayers)
+  const defenderId = (attackerId + 1) % newState.numberOfPlayers
+  
+
+  return {
+    ...newState,
+    attackerId,
+    defenderId,
+    currentId:attackerId,
+    status:'playing',
+    
+  }
+}
 
 const playBotMoves = (room: Room, res:ServerResponse) : GameView[]=> {
   const stateHistory: GameView[] = [gameView(room.state,room.roomId)];
@@ -143,6 +159,63 @@ const gameView = (state: GameState, roomId:string): GameView => {
   };
 };
 
+const broadcastState = (io:Server, room:Room):void => {
+  const deckCards: Card[] = [];
+  for (let i = 0; i < room.state.deck.cards.length; i++) {
+    deckCards.push({
+      id: "",
+      value: 0,
+      suit: "",
+    });
+  }
+  const deckForView = {
+    cards: deckCards,
+    trump: room.state.deck.trump,
+  };
+  room.sockets.forEach((socketPlayer, socketID) => {
+    const players : Player[] = []
+    room.state.players.forEach((player) => {
+    if (player.id === socketPlayer.id) {
+      const playerToView = structuredClone(player);
+      players.push(playerToView);
+    }
+    else {
+      const numberOfCards = player.cards.length;
+      const cards: Card[] = [];
+      for (let i = 0; i < numberOfCards; i++) {
+        const card = {
+          id: "",
+          value: 0,
+          suit: "",
+        };
+        cards.push(card);
+      }
+      const playerToView = { ...player, cards };
+      players.push(playerToView);
+    }
+  });
+
+    const personalState : GameView= {
+      numberOfPlayers:room.state.numberOfPlayers,
+    players: players,
+    deck: deckForView,
+    currentCards: room.state.currentCards,
+    attackerId: room.state.attackerId,
+    defenderId: room.state.defenderId,
+    currentId: room.state.currentId,
+    leftovers: room.state.leftovers.length,
+    disablePassButton: room.state.disablePassButton,
+    status: room.state.status,
+    roomId:room.roomId,
+    finishOrder: room.state.finishOrder,
+    playersOnline:room.state.playersOnline
+    }
+    io.to(socketID).emit("broadcast", personalState)
+  });
+  
+}
+
+
 const server = http.createServer(
   async (req: IncomingMessage, res: ServerResponse) => {
     if (!req.url) {
@@ -159,6 +232,7 @@ const server = http.createServer(
         roomId,
         state,
         tokens: new Map([[playerToken, 0]]),
+        sockets: new Map()
       };
 
       const response = {
@@ -248,20 +322,28 @@ const server = http.createServer(
     }
     if (req.method === "POST" && joinRoomPattern.test(req.url)) {
       const room = getRoom(req, joinRoomPattern)
+      
       if(!room){
         res.writeHead(409, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Conflict" }));
+        return;
+      }
+      if(room.state.playersOnline===room.state.numberOfPlayers){
+        res.writeHead(409, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Room is full." }));
         return;
       }
       const data = await getData<JoinRoomRequest>(req)
       const playerToken = randomUUID();
       room.state.playersOnline+=1
       const player: Player = initializePlayer(data.playerName, room.state.players.length)
+      room.tokens.set(playerToken,player.id)
       room.state.players.push(player)
       const response = {
         roomId:room.roomId,
         state: gameView(room.state, room.roomId),
-        token: playerToken
+        token: playerToken,
+        sockets: room.sockets
       };
       res.writeHead(201, { "Content-Type": "application/json" });
       res.end(JSON.stringify(response));
@@ -269,6 +351,48 @@ const server = http.createServer(
     }
   },
 );
+
+const io = new Server(server,{
+  cors: {origin:'*'}
+})
+
+io.on("connection",(socket)=>{
+  
+
+  socket.on("join_room", (roomID)=>{
+    socket.join(roomID)
+    const room = rooms.get(roomID)
+    if(!room) return
+    const player = room.state.players[room.state.players.length - 1]
+    room.sockets.set(socket.id,player)
+    if(room.state.playersOnline===room.state.numberOfPlayers){
+      console.log("Full")
+      const newState = startGame(room.state)
+      if(newState){
+        room.state=newState
+        broadcastState(io,room)
+        return
+      }
+    }
+    io.to(roomID).emit("update_game", gameView(room.state, room.roomId) )
+  })
+  socket.on("player_left", (token)=>{
+    for(const roomID of socket.rooms)
+      if(roomID!==socket.id){
+        socket.leave(roomID)
+        const room : Room | undefined= rooms.get(roomID)
+        if(!room) return
+        if(room){
+          const player = room.state.players.find((player)=>player.id===room.tokens.get(token))
+          console.log(player)
+          room.state.players = room.state.players.filter(playerstate=>playerstate.id!==player?.id)
+          room.state.playersOnline-=1
+        }
+        console.log(room.state.players)
+        io.to(roomID).emit("update_game", gameView(room?.state,room?.roomId))
+      }
+  })
+})
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
