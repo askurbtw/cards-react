@@ -1,3 +1,4 @@
+
 import type { Card } from "./card.types.ts";
 import type { GameView } from "./gameView.types.ts";
 
@@ -11,8 +12,11 @@ export interface GameContextType {
     joinGame: (playerName:string, roomID:string) => Promise<string>;
     applyMove: ( card:Card) => string;
     applyPass: () => string;
-    token:string;
-    myPlayerId:number
+    token:string | null;
+    myPlayerId:number| null;
+    
+    rejoin: (roomID:string, token:string)=>void;
+    
     
     
 }

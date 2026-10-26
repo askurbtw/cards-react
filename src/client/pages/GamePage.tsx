@@ -5,22 +5,32 @@ import PlayerComponent from '../components/PlayerComponent'
 import TableComponent from '../components/TableComponent'
 import getPlayer from '@shared/utils/getPlayer'
 import { useSocket } from '../context/SocketContext'
-import { useEffect } from 'react'
+
 
 export default function GamePage() {
-    const { game } = useGame()
-    const {socket} = useSocket()
-    const {token} = useGame()
-    useEffect(()=>{
-        return () =>{
-            if(socket && socket.connected){
-                console.log("leaving")
-                socket.emit("player_left", token)
-            }
-        }
-    }, [socket,token])
+    const { game, rejoin } = useGame()
+    const {socket, token} = useSocket()
+    
+   
     if (!game) {
-        return <Navigate to='/' replace />
+        console.log("no game")
+        if(!socket){
+            return (<div>
+                <h1>Loading...</h1>
+            </div>)
+        }
+        const path = window.location.pathname
+        const roomID = path.split('/')[2]
+        console.log(roomID)
+
+        if(!roomID){
+            alert("Room undefined.")
+            return <Navigate to='/' replace/>
+        }
+        rejoin(roomID, token||'' )
+        
+        return
+        // return <Navigate to='/' replace />
     }
     const gameText = game.status === "waiting for players" ? `Waiting for ${game.numberOfPlayers - game.playersOnline} more players` :
         game.currentId!==undefined && game.attackerId!==undefined && game.defenderId!==undefined ? game.currentId === game.attackerId

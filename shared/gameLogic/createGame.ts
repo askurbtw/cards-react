@@ -18,7 +18,7 @@ export default function createGame(numberOfPlayers:number, playerName:string) : 
         disablePassButton:true,
         status: "waiting for players",
         finishOrder: [],
-        playersOnline:1
+        playersOnline:0
     }
 
 }

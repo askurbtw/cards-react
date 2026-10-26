@@ -195,7 +195,7 @@ const broadcastState = (io: Server, room: Room): void => {
     );
     const personalState: GameView = {
       numberOfPlayers: room.state.numberOfPlayers,
-      players: players,
+      players: [...players.slice(socketPlayer.id), ...players.slice(0, socketPlayer.id)],
       deck: deckForView,
       currentCards: room.state.currentCards,
       attackerId: room.state.attackerId,
@@ -228,7 +228,7 @@ const server = http.createServer(
       const room = {
         roomId,
         state,
-        tokens: new Map([[playerToken, 0]]),
+        tokens: new Map([[playerToken, state.players[0].id]]),
         sockets: new Map(),
       };
 
@@ -236,6 +236,7 @@ const server = http.createServer(
         roomId,
         state: gameView(state, roomId),
         token: playerToken,
+        playerID : state.players[0].id
       };
       rooms.set(roomId, room);
       res.writeHead(201, { "Content-Type": "application/json" });
@@ -333,7 +334,6 @@ const server = http.createServer(
       }
       const data = await getData<JoinRoomRequest>(req);
       const playerToken = randomUUID();
-      room.state.playersOnline += 1;
       const player: Player = initializePlayer(
         data.playerName,
         room.state.players.length,
@@ -344,7 +344,7 @@ const server = http.createServer(
         roomId: room.roomId,
         state: gameView(room.state, room.roomId),
         token: playerToken,
-        sockets: room.sockets,
+        playerID: player.id
       };
       res.writeHead(201, { "Content-Type": "application/json" });
       res.end(JSON.stringify(response));
@@ -358,10 +358,12 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  socket.on("join_room", (roomID) => {
-    socket.join(roomID);
-    const room = rooms.get(roomID);
-    if (!room) return;
+  socket.on("join_room", (roomId, callback) => {
+    const room = rooms.get(roomId);
+    if (!room) return callback({error:"No room found"})
+    if(room.state.numberOfPlayers===room.state.playersOnline) return callback({error:"Room is full"})
+    socket.join(roomId)
+    room.state.playersOnline += 1;
     const player = room.state.players[room.state.players.length - 1];
     room.sockets.set(socket.id, player);
     if (room.state.playersOnline === room.state.numberOfPlayers) {
@@ -373,7 +375,7 @@ io.on("connection", (socket) => {
         return;
       }
     }
-    io.to(roomID).emit("update_game", gameView(room.state, room.roomId));
+    broadcastState(io, room);
   });
   socket.on("player_left", (token) => {
     for (const roomID of socket.rooms)
@@ -392,12 +394,17 @@ io.on("connection", (socket) => {
           room.state.playersOnline -= 1;
         }
         console.log(room.state.players);
-        io.to(roomID).emit("update_game", gameView(room?.state, room?.roomId));
+        broadcastState(io, room);
       }
   });
   socket.on("make_move", (cardId, callback) => {
     const roomID = Array.from(socket.rooms)[1];
     const room = rooms.get(roomID);
+    console.log(socket.rooms)
+    console.log(roomID)
+
+    console.log(room)
+    console.log(room?.sockets)
     const player = room?.sockets.get(socket.id);
     if (!player) {
       return callback({ error: "No player found." });
@@ -424,6 +431,7 @@ io.on("connection", (socket) => {
   socket.on("make_pass", (callback) => {
     const roomID = Array.from(socket.rooms)[1];
     const room = rooms.get(roomID);
+    
     const player = room?.sockets.get(socket.id);
     if (!player) {
       return callback({ error: "No player found." });
@@ -439,6 +447,32 @@ io.on("connection", (socket) => {
     room.state = nextState;
     broadcastState(io, room);
   });
+  socket.on("rejoin",(data,callback)=>{
+    const roomID = data.roomID
+    const token = data.token
+    console.log(roomID)
+    const room = rooms.get(roomID)
+    
+    if(!room) {console.log("No room")
+      return}
+    const player = room.state.players.find(player=>player.id===room.tokens.get(token))
+    if(!player) {console.log("No player")
+      return}
+    callback(player.id)
+    room.sockets.set(socket.id, player)
+    broadcastState(io,room)
+  })
+  socket.on("disconnect",(reason)=>{
+    console.log(`Player ${socket.id} disconnected.`)
+    console.log(reason)
+    const roomID = Array.from(socket.rooms)[1]
+    const room = rooms.get(roomID)
+    if(!room) return
+    const result = room.sockets.delete(socket.id)
+    if(result) console.log("Socket deleted")
+      else return console.log("Socket was not deleted.")
+
+  })
 });
 
 server.listen(PORT, () => {

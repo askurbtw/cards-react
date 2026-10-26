@@ -1,31 +1,37 @@
-import {  useState, type ReactNode } from "react";
-import { io, Socket} from 'socket.io-client';
+import {  useCallback, useState, type ReactNode } from "react";
+import { io, Socket } from 'socket.io-client';
 import { SocketContext } from "./SocketContext";
+import type SocketContextType from "@shared/types/socketcontexttype.types";
 
 
-export const SocketContextProvider = ({children}: { children: ReactNode }) => {
-    
+
+export const SocketContextProvider = ({ children }: { children: ReactNode }) => {
+    const [token, setToken] = useState<string| null>(()=>{
+        return window.localStorage.getItem("token")
+    })
     const [socket, setSocket] = useState<Socket | null>(null)
-    const [isConnected, setIsConnected] = useState<boolean>(false)
 
-    const makeHandshake =  (roomID:string) : boolean => {
-        let connected = false
+    const makeHandshake = useCallback(() => {
         const socket = io('http://localhost:8000')
-        if(socket){
-            connected = true
-            console.log(`handshaked succesfully.`)
-            setIsConnected(true)
-            socket.emit("join_room",roomID)
-        }
-        setSocket(socket)
-        return connected
+        socket.on("connect", () => {
+            setSocket(socket)
+            
+            console.log("connected")
+            
+        })
+    },[])
+    const updateToken = (token:string) =>{
+        setToken(token)
+        window.localStorage.setItem("token", token)
     }
-    const contextValue = {
+    const contextValue: SocketContextType= {
+        token,
         socket,
-        isConnected,
-        makeHandshake
+        
+        makeHandshake,
+        updateToken
     }
 
-    return(<SocketContext.Provider value = {contextValue}>
-    {children}</SocketContext.Provider>)
+    return (<SocketContext.Provider value={contextValue}>
+        {children}</SocketContext.Provider>)
 }
