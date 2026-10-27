@@ -5,7 +5,7 @@ export function DeckComponent(props: { deck: Deck }) {
     const cardURL = `/images/cards/reverse_card.svg`
     return (
         <div id="deck">
-            <div>
+            <div className={props.deck.cards.length===0?'last':undefined}>
                 <img src={`/images/cards/${props.deck.trump?.value}_of_${props.deck.trump?.suit}.svg`} alt="" />
             </div>
             {props.deck.cards.map((_, index) => {

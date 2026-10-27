@@ -248,14 +248,18 @@ img.defence-card{
 #trump-card{
     position: absolute;
 }
+.last{
+    opacity: 0.25;
+}
 
 @keyframes shake-card{
-    0%,100% {transform: translateX(0px);}
-    20%,60% {transform: translateX(8px) rotate(3deg);}
-    40%,80% {transform: translateX(-8px) rotate(-3deg);}
+    0%,100% {transform: translateX(0px) rotateY(180deg);}
+    20%,60% {transform: translateX(8px) rotate(3deg) rotateY(180deg);}
+    40%,80% {transform: translateX(-8px) rotate(-3deg) rotateY(180deg);}
 }
 
 .invalid-card{
+    
     animation: shake-card 0.4s ease-in-out;
     box-shadow: 0px 0px 10px #FF0101bf !important;
 }

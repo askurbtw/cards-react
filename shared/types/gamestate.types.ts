@@ -17,4 +17,5 @@ export type GameState = {
   disablePassButton: boolean;
   status: "playing" | "finished" | "waiting for players";
   finishOrder: number[];
+  isSinglePlayer :boolean;
 };

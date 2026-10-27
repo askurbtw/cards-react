@@ -27,7 +27,8 @@ export default function MultiPlayerPage(): React.JSX.Element {
             alert(`Player name was not assigned.`)
             return
         }
-        const roomId = await startGame(numberOfPlayers, playerName)
+        
+        const roomId = await startGame(numberOfPlayers, playerName, "m")
         navigate(`/GamePage/${roomId}`)
 
     }
@@ -46,7 +47,7 @@ export default function MultiPlayerPage(): React.JSX.Element {
             alert(`Room id was not assigned.`)
             return
         }
-        const roomId = await joinGame(playerName, joinRoomId)
+        const roomId = await joinGame(playerName, joinRoomId, "m")
         navigate(`/GamePage/${roomId}`)
 
     }

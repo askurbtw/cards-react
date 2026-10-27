@@ -1,6 +1,7 @@
 import type {  Card, GameState } from "../types/index.ts";
 
 
+
 export default function checkValidCard(
   cardIdToCheck: string,
   state: GameState,
@@ -17,6 +18,8 @@ export default function checkValidCard(
   const movesCounter = state.movesCounter
   if (cardToCheck && currentCards && moveType && trumpCard) {
     if (moveType === "attack") {
+      const defencePlayer = state.players.find(player=>player.id===state.defenderId)
+      if(defencePlayer?.cards.length===0) return {isCardValid: false, card: null}
       if (
         !currentCards.some((card) => card.card.value === cardToCheck.value) &&
         movesCounter !== 1
@@ -29,6 +32,7 @@ export default function checkValidCard(
       ) {
         return {isCardValid: true, card: cardToCheck};
       }
+      
     }
     if (moveType === "defence") {
       const currentCard = currentCards[currentCards.length - 1];

@@ -1,16 +1,21 @@
-import { Navigate } from 'react-router-dom'
+
 import { useGame } from '../context/GameContext'
 import '../../style.css'
 import PlayerComponent from '../components/PlayerComponent'
 import TableComponent from '../components/TableComponent'
 import getPlayer from '@shared/utils/getPlayer'
 import { useSocket } from '../context/SocketContext'
+import { useNavigate } from 'react-router-dom'
 
 
 export default function GamePage() {
+    const navigate = useNavigate()
     const { game, rejoin } = useGame()
     const {socket, token} = useSocket()
-    
+    const handleGoBack = () =>{
+        
+        navigate(`/` )
+    }
    
     if (!game) {
         console.log("no game")
@@ -25,7 +30,7 @@ export default function GamePage() {
 
         if(!roomID){
             alert("Room undefined.")
-            return <Navigate to='/' replace/>
+            navigate(`/` )
         }
         rejoin(roomID, token||'' )
         
@@ -39,9 +44,10 @@ export default function GamePage() {
             : ''
     console.log(gameText)
     if (game.status === "finished") {
+        
         return (
             <>
-                <h1>{`Winner is: ${game.finishOrder[0]}`}</h1>
+                <h1>{`Winner is: ${getPlayer(game.players,game.finishOrder[0]).name}`}</h1>
                 <h2>Finish order</h2>
                 <ol>
                     {game.finishOrder.map((player) => {
@@ -50,6 +56,7 @@ export default function GamePage() {
                         )
                     })}
                 </ol>
+                <button onClick={handleGoBack}>Go back to home page.</button>
             </>
         )
     }

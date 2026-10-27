@@ -12,13 +12,19 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
     const [socket, setSocket] = useState<Socket | null>(null)
 
     const makeHandshake = useCallback(() => {
-        const socket = io('http://localhost:8000')
+        const initialToken = window.localStorage.getItem("token")
+        const socket = io('http://localhost:8000',{
+            auth:{
+                token :initialToken
+            }
+        })
         socket.on("connect", () => {
             setSocket(socket)
             
             console.log("connected")
             
         })
+        
     },[])
     const updateToken = (token:string) =>{
         setToken(token)

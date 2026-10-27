@@ -1,4 +1,5 @@
 export default interface SocketResponse{
-    error:string,
-    success:boolean
+    data:{playerID:number, token:string} 
+    error:string | null ,
+    
 }

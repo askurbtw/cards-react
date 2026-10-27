@@ -1,5 +1,6 @@
 import type { Card, GameState } from "../types/index.ts";
 import getPlayer from "../utils/getPlayer.ts";
+import endRound from "./endRound.ts";
 
 export default function makeMove(
   state: GameState,
@@ -15,6 +16,12 @@ export default function makeMove(
   const moveType = state.currentId === state.attackerId ? "attack" : "defence";
 
   if (moveType === "attack") {
+    const defencePlayer = state.players.find(player=>player.id===state.defenderId)
+    if(
+        defencePlayer?.cards.length===0){
+          return endRound(state,false)
+          
+        }
     currentPlayer.cards = currentPlayer.cards.filter((playerCard) => {
       return playerCard.id != card.id;
     });
@@ -31,6 +38,7 @@ export default function makeMove(
     currentCardsCopy.push(cardToDeck);
     nextPlayerId = state.attackerId;
     moveNumber++;
+    
   }
   
 

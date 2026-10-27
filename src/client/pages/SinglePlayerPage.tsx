@@ -22,7 +22,7 @@ export default function SinglePlayerPage():React.JSX.Element{
             alert(`Player name was not assigned.`)
             return
         }
-        const roomId = await startGame(numberOfPlayers,playerName)
+        const roomId = await startGame(numberOfPlayers,playerName, 's')
         navigate(`/GamePage/${roomId}` )
 
     }

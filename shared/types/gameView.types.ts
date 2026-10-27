@@ -15,6 +15,7 @@ export type GameView = {
     leftovers:number,
     disablePassButton: boolean,
     status: "playing" | "finished" | "waiting for players",
-    finishOrder: number[]
+    finishOrder: number[],
+    
 
 }
