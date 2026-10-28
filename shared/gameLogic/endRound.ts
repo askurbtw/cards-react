@@ -12,9 +12,7 @@ export default function endRound(state:GameState, deffPass:boolean) : GameState 
     newState = addCards(newState)
     newState = updateFinishOrder(newState)
     const nextAtkIndex = deffPass?state.attackerId+2:state.attackerId+1;
-    const playersCopy = structuredClone(state.players)
-
-    const [nextAttackerId, nextDefenderId] = findNextPlayers(playersCopy, nextAtkIndex)
+    const [nextAttackerId, nextDefenderId] = findNextPlayers(newState, nextAtkIndex)
     return {
         ...newState,
         attackerId:nextAttackerId,

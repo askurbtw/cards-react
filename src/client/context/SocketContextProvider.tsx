@@ -1,4 +1,4 @@
-import {  useCallback, useState, type ReactNode } from "react";
+import {   useEffect, useState, type ReactNode } from "react";
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from "./SocketContext";
 import type SocketContextType from "@shared/types/socketcontexttype.types";
@@ -11,7 +11,8 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
     })
     const [socket, setSocket] = useState<Socket | null>(null)
 
-    const makeHandshake = useCallback(() => {
+
+    useEffect(()=>{
         const initialToken = window.localStorage.getItem("token")
         const socket = io('http://localhost:8000',{
             auth:{
@@ -24,8 +25,11 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
             console.log("connected")
             
         })
-        
+        return ()=>{
+            socket.disconnect()
+        }
     },[])
+    
     const updateToken = (token:string) =>{
         setToken(token)
         window.localStorage.setItem("token", token)
@@ -34,7 +38,7 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
         token,
         socket,
         
-        makeHandshake,
+        
         updateToken
     }
 

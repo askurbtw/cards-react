@@ -5,8 +5,10 @@ import type {  Room } from "@shared/types";
 import gameView from "../server/utils/gameView";
 
 export default function testPlayerMove(room:Room){
+  if(room.state.status==='finished') return gameView(room.state, room.roomId)
     const validCard = botFindValidCard(room.state);
         if (validCard) {
+          console.log("Applying move");
           const newState = makeMove(room.state, validCard);
           if (!newState) {
             return

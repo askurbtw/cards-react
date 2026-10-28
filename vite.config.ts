@@ -1,6 +1,6 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
 import { fileURLToPath } from 'node:url'
+import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -16,4 +16,10 @@ export default defineConfig({
         changeOrigin: true,
       }, },
   },
+  test: {
+    environment: 'node',
+    globals: true,                  
+    include: ['tests/**/*.test.ts'],
+  },
+  
 })

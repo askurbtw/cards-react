@@ -19,11 +19,10 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
     const [game, setGame] = useState<GameView | null>(null)
 
     const [myPlayerId, setMyPlayerId] = useState<number | null>(null)
-    const { token, updateToken, socket, makeHandshake } = useSocket()
+    const { token, updateToken, socket } = useSocket()
 
     useEffect(() => {
         if (!socket) {
-            makeHandshake()
             return
         }
         console.log("loading listeners")
@@ -32,7 +31,6 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             if (newState.length === 1) { setGame(newState[0]) }
             else {
                 for (const state of newState) {
-                    
                     setGame(state)
                     await customDelay(3000)
                 }
@@ -42,25 +40,26 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         })
         return () => {
             console.log("Unmounting")
-            socket.disconnect()
+            socket.removeAllListeners()
         }
 
-    }, [makeHandshake, socket])
+    }, [ socket])
 
     const joinRoomAsync = (data: { state: GameView, roomId: string, playerName: string }, gameType: 's' | 'm') => {
         if (!socket) return
         return new Promise<void>((resolve, reject) => {
             if(!gameType) return reject("GameType was not specified.")
-            if (gameType === 'm') {
-                socket.emit("join_room", { roomId: data.roomId, playerName: data.playerName }, (response: SocketResponse) => {
+                const emitRoute = gameType==='m'?'join_room':'single_player'
+                socket.emit(emitRoute, { roomId: data.roomId, playerName: data.playerName }, (response: SocketResponse) => {
                     if (response.error) {
-                        reject(new Error(response.error))
+                        return reject(new Error(response.error))
                     }
                     const playerID = response.data.playerID
                     setMyPlayerId(playerID)
                     const players = [...data.state.players.slice(playerID), ...data.state.players.slice(0, playerID)]
-                    data.state.players = players
-                    setGame(data.state)
+                    const stateCopy = structuredClone(data.state)
+                    stateCopy.players = players
+                    setGame(stateCopy)
                     updateToken(response.data.token)
                     setNumberOfPlayers(data.state.numberOfPlayers)
                     console.log(data)
@@ -68,26 +67,8 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
 
                 })
 
-            }
-            if (gameType === 's') {
-                console.log(gameType)
-                socket.emit("single_player", { roomId: data.roomId, playerName: data.playerName }, (response: SocketResponse) => {
-                    if (response.error) {
-                        reject(new Error(response.error))
-                    }
-                    const playerID = response.data.playerID
-                    setMyPlayerId(playerID)
-                    const players = [...data.state.players.slice(playerID), ...data.state.players.slice(0, playerID)]
-                    data.state.players = players
-                    setGame(data.state)
-                    updateToken(response.data.token)
-                    setNumberOfPlayers(data.state.numberOfPlayers)
-                    console.log(data)
-                    return resolve()
-
-                })
-
-            }
+            
+            
 
         })
     }
@@ -102,8 +83,8 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
                 console.log("making move")
                 if (response.error) {
                     console.log(response.error)
-                    reject(response.error)
-                    return response.error
+                    return reject(response.error)
+                    
                 }
                 resolve('Success.')
             })
