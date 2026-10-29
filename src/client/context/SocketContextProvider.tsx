@@ -18,7 +18,8 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
         const socket = io(BACKEND_URL,{
             auth:{
                 token :initialToken
-            }
+            },
+            transports:['polling'],
         })
         socket.on("connect", () => {
             setSocket(socket)

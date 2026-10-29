@@ -1,5 +1,5 @@
-import { initializePlayers } from "../../shared/gameLogic/initializePlayers.ts";
-import type { GameState } from "../../shared/types";
+import { initializePlayers } from "../../shared/gameLogic/initializePlayers.js";
+import type { GameState } from "../../shared/types/index.js";
 
 export default function beginGame (state: GameState): GameState{
   const newState = initializePlayers(state);

@@ -1,5 +1,5 @@
 import type { Server } from "socket.io";
-import type { Card, GameView, Player, Room } from "../../shared/types";
+import type { Card, GameView, Player, Room } from "../../shared/types/index.js";
 
 export default function broadcastState (io: Server, room: Room): void {
   console.log("Broadcasting new state")

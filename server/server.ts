@@ -1,21 +1,21 @@
 import http, { IncomingMessage, ServerResponse } from "http";
-import { type Room } from "../shared/types/index.ts";
+import { type Room } from "../shared/types/index.js";
 import { randomUUID } from "node:crypto";
-import createGame from "../shared/gameLogic/createGame.ts";
+import createGame from "../shared/gameLogic/createGame.js";
 import type CreateRoomRequest from "../shared/types/createroomtype.types.ts";
-import broadcastState from "./utils/broadcastState.ts";
-import checkValidCard from "../shared/gameLogic/checkValidCard.ts";
-import makeMove from "../shared/gameLogic/makeMove.ts";
-import makePass from "../shared/gameLogic/makePass.ts";
-import { initializePlayer } from "../shared/gameLogic/initializePlayer.ts";
-import getData from "./utils/getData.ts";
+import broadcastState from "./utils/broadcastState.js";
+import checkValidCard from "../shared/gameLogic/checkValidCard.js";
+import makeMove from "../shared/gameLogic/makeMove.js";
+import makePass from "../shared/gameLogic/makePass.js";
+import { initializePlayer } from "../shared/gameLogic/initializePlayer.js";
+import getData from "./utils/getData.js";
 import { Server } from "socket.io";
-import playBotMoves from "./utils/playBotMoves.ts";
-import gameView from "./utils/gameView.ts";
-import beginGame from "./utils/beginGame.ts";
+import playBotMoves from "./utils/playBotMoves.js";
+import gameView from "./utils/gameView.js";
+import beginGame from "./utils/beginGame.js";
 
-const PORT = 8000;
-
+const PORT = Number(process.env.PORT) || 8000 ;
+const ALLOWED_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173'
 const rooms: Map<string, Room> = new Map();
 const joinRoomPattern = /^\/routes\/join\/room\/([^/]+)$/;
 
@@ -28,6 +28,19 @@ const getRoom = (req: IncomingMessage, regex: RegExp): Room | undefined => {
 
 const server = http.createServer(
   async (req: IncomingMessage, res: ServerResponse) => {
+    res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN)
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  res.setHeader('Vary', 'Origin')
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204)
+    res.end()
+    return
+  }
+    if (req.url && req.url.startsWith('/socket.io/')) {
+    return; 
+  }
     if (!req.url) {
       res.writeHead(400, { "Content-Type": "application/json" });
       return res.end(JSON.stringify({ error: "Missing request URL" }));
@@ -76,12 +89,11 @@ const server = http.createServer(
   },
 );
 
-const io = new Server(server, {
-  cors: { origin: "*" },
-});
+const io = new Server(server, { cors: { origin: ALLOWED_ORIGIN } });
 
 io.on("connection", (socket) => {
   socket.on("join_room", (data, callback) => {
+    console.log("Joining1")
     const room = rooms.get(data.roomId);
     if (!room) return callback({ error: "No room found" });
     if (room.state.numberOfPlayers === room.state.playersOnline)
@@ -93,11 +105,13 @@ io.on("connection", (socket) => {
     room.sockets.set(socket.id, playerToken);
     room.tokens.set(playerToken, player.id);
     room.state.playersOnline += 1;
+    console.log("Joining2")
     if (room.state.playersOnline === room.state.numberOfPlayers) {
       console.log("Full");
-      const newState = room.state;
+      const newState = beginGame(room.state)
       if (newState) {
         room.state = newState;
+        console.log(room.state)
         callback({
           data: { playerID: player.id, token: playerToken },
           error: "",
@@ -107,6 +121,7 @@ io.on("connection", (socket) => {
         return;
       }
     }
+    console.log("Joining3")
     callback({ data: { playerID: player.id, token: playerToken }, error: "" });
     broadcastState(io, room);
   });
@@ -159,6 +174,7 @@ io.on("connection", (socket) => {
       room.state.currentId === room.state.attackerId ? "attack" : "defence";
     const { isCardValid, card } = checkValidCard(cardId, room.state, moveType);
     if (!isCardValid || !card) {
+      console.log("Invalid move.")
       return callback({ error: "Invalid move." });
     }
     const nextState = makeMove(room.state, card);
@@ -173,6 +189,9 @@ io.on("connection", (socket) => {
       io.to(socket.id).emit("broadcast", stateHistory);
     } else {
       broadcastState(io, room);
+    }
+    if(room.state.status==="finished"){
+      io.in(roomID).socketsLeave(roomID)
     }
   });
 
@@ -190,6 +209,7 @@ io.on("connection", (socket) => {
     }
     const isPlayerTurn = room?.state.currentId === playerID ? true : false;
     if (!room || !isPlayerTurn) {
+      console.log("Invalid move.")
       return callback({ error: "Invalid move." });
     }
     const nextState = makePass(room.state);
@@ -202,6 +222,9 @@ io.on("connection", (socket) => {
       io.to(socket.id).emit("broadcast", stateHistory);
     } else {
       broadcastState(io, room);
+    }
+    if(room.state.status==="finished"){
+      io.in(roomID).socketsLeave(roomID)
     }
   });
   socket.on("rejoin", (data, callback) => {
@@ -275,6 +298,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });

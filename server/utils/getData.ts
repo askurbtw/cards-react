@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "http";
-import type CreateRoomRequest from "../../shared/types/createroomtype.types";
-import type JoinRoomRequest from "../../shared/types/joinrequesttype.types";
+import type CreateRoomRequest from "../../shared/types/createroomtype.types.js";
+import type JoinRoomRequest from "../../shared/types/joinrequesttype.types.js";
 
 type allowedTypes = CreateRoomRequest | JoinRoomRequest;
 export default async function getData<T extends allowedTypes> (
