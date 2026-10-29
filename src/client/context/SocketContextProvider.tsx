@@ -6,6 +6,7 @@ import type SocketContextType from "@shared/types/socketcontexttype.types";
 
 
 export const SocketContextProvider = ({ children }: { children: ReactNode }) => {
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
     const [token, setToken] = useState<string| null>(()=>{
         return window.localStorage.getItem("token")
     })
@@ -14,7 +15,7 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
 
     useEffect(()=>{
         const initialToken = window.localStorage.getItem("token")
-        const socket = io('http://localhost:8000',{
+        const socket = io(BACKEND_URL,{
             auth:{
                 token :initialToken
             }
@@ -28,7 +29,7 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
         return ()=>{
             socket.disconnect()
         }
-    },[])
+    },[BACKEND_URL])
     
     const updateToken = (token:string) =>{
         setToken(token)

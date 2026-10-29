@@ -14,6 +14,7 @@ import customDelay from "@shared/utils/customDelay";
 
 
 export const GameContextProvider = ({ children }: { children: ReactNode }) => {
+    const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
     const [numberOfPlayers, setNumberOfPlayers] = useState<number | null>(null)
     const [playerName, setPlayerName] = useState<string | null>(null)
     const [game, setGame] = useState<GameView | null>(null)
@@ -38,6 +39,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             }
 
         })
+        
         return () => {
             console.log("Unmounting")
             socket.removeAllListeners()
@@ -46,14 +48,22 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
     }, [ socket])
 
     const joinRoomAsync = (data: { state: GameView, roomId: string, playerName: string }, gameType: 's' | 'm') => {
-        if (!socket) return
+        if (!socket) {
+            console.log("No socket")
+            return
+        }
+        console.log("Socket is defined")
+        console.log(socket)
+        console.log(data.roomId)
         return new Promise<void>((resolve, reject) => {
             if(!gameType) return reject("GameType was not specified.")
                 const emitRoute = gameType==='m'?'join_room':'single_player'
+            
                 socket.emit(emitRoute, { roomId: data.roomId, playerName: data.playerName }, (response: SocketResponse) => {
                     if (response.error) {
                         return reject(new Error(response.error))
                     }
+                    console.log("Emitting")
                     const playerID = response.data.playerID
                     setMyPlayerId(playerID)
                     const players = [...data.state.players.slice(playerID), ...data.state.players.slice(0, playerID)]
@@ -91,10 +101,13 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         })
     }
     const startGame = async (numberOfPlayers: number, playerName: string, gameType: 's' | 'm'): Promise<string> => {
-        if (!socket) return 'Socket error.'
+        if (!socket) {
+            console.log(`Socket error.`)
+            return 'Socket error.'
+        }
         setNumberOfPlayers(numberOfPlayers)
         setPlayerName(playerName)
-        const response = await fetch('/routes/create/room', {
+        const response = await fetch(`${API_URL}/routes/create/room`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -108,7 +121,6 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         if (!response.ok) {
             throw new Error('Server error')
         }
-
         const data = await response.json();
         await joinRoomAsync({ state: data.state, roomId: data.roomId, playerName }, gameType)
         console.log("resolved")
@@ -117,7 +129,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
     }
     const joinGame = async (playerName: string, roomID: string, gameType: 's' | 'm'): Promise<string> => {
         if (!socket) return 'Socket error.'
-        const response = await fetch(`/routes/join/room/${roomID}`, {
+        const response = await fetch(`${API_URL}/routes/join/room/${roomID}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
