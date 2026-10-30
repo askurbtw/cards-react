@@ -13,6 +13,7 @@ import { Server } from "socket.io";
 import playBotMoves from "./utils/playBotMoves.js";
 import gameView from "./utils/gameView.js";
 import beginGame from "./utils/beginGame.js";
+import endRound from "../shared/gameLogic/endRound.js";
 
 const PORT = Number(process.env.PORT) || 8000 ;
 const ALLOWED_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173'
@@ -183,7 +184,11 @@ io.on("connection", (socket) => {
       return callback({ error: "Something went wrong" });
     }
     room.state = nextState;
-
+    if(moveType==='attack'?room.state.players.find(player=>player.id===room.state.defenderId)?.cards.length===0 :
+        room.state.players.find(player=>player.id===room.state.attackerId)?.cards.length===0){
+            const newState = endRound(room.state,false)
+            room.state = newState;
+          }
     if (room.state.isSinglePlayer) {
       const stateHistory = playBotMoves(room);
       io.to(socket.id).emit("broadcast", stateHistory);

@@ -44,7 +44,6 @@ export default function GamePage() {
             : ''
     console.log(gameText)
     if (game.status === "finished") {
-        
         return (
             <>
                 <h1>{`Winner is: ${getPlayer(game.players,game.finishOrder[0]).name}`}</h1>

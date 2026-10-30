@@ -1,4 +1,4 @@
-import type { Card, GameState, GameView, Player } from "../../shared/types";
+import type { Card, GameState, GameView, Player } from "../../shared/types/index.js";
 
 export default function gameView (state: GameState, roomId: string): GameView{
   const playersForView: Player[] = [];

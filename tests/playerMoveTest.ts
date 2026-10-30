@@ -1,6 +1,6 @@
 import botFindValidCard from "@shared/gameLogic/botFindValidCard";
-import makeMove from "@shared/gameLogic/makeMove";
-import makePass from "@shared/gameLogic/makePass";
+import makeMove from "@shared/gameLogic/makeMove.js";
+import makePass from "@shared/gameLogic/makePass.js";
 import type {  Room } from "@shared/types";
 import gameView from "../server/utils/gameView";
 

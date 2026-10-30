@@ -8,7 +8,7 @@ export default function findNextPlayers(
   
   const players = state.players
   const numberOfPlayers = players.length;
-  if(state.status==='finished') return [attackerId % numberOfPlayers, attackerId + 1 % numberOfPlayers];
+  if(state.status==='finished') return [attackerId % numberOfPlayers, (attackerId + 1) % numberOfPlayers];
   for (let i = 0; i < numberOfPlayers - 1; i++) {
     if (players[attackerId % numberOfPlayers].isOutOfCards === false) {
       

@@ -27,8 +27,8 @@ export default function MultiPlayerPage(): React.JSX.Element {
             alert(`Player name was not assigned.`)
             return
         }
-        
         const roomId = await startGame(numberOfPlayers, playerName, "m")
+        console.log(roomId)
         navigate(`/GamePage/${roomId}`)
 
     }

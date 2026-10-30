@@ -11,7 +11,7 @@ export default function endRound(state:GameState, deffPass:boolean) : GameState 
     let newState = newStateFunction()
     newState = addCards(newState)
     newState = updateFinishOrder(newState)
-    const nextAtkIndex = deffPass?state.attackerId+2:state.attackerId+1;
+    const nextAtkIndex = deffPass?state.defenderId+1:state.attackerId+1;
     const [nextAttackerId, nextDefenderId] = findNextPlayers(newState, nextAtkIndex)
     return {
         ...newState,

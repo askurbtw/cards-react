@@ -1,15 +1,15 @@
 import { it,expect,describe } from "vitest";
-import type { GameState, GameView, Player, Room } from "@shared/types"
-import createGame from "@shared/gameLogic/createGame";
-import { initializePlayer } from "@shared/gameLogic/initializePlayer";
-import beginGame from "../server/utils/beginGame";
-import playBotMoves from "../server/utils/playBotMoves";
-import botFindValidCard from "@shared/gameLogic/botFindValidCard";
-import testPlayerMove from "./playerMoveTest";
+import type { GameState, GameView, Player, Room } from "@shared/types/index.js"
+import createGame from "@shared/gameLogic/createGame.js";
+import { initializePlayer } from "@shared/gameLogic/initializePlayer.js";
+import beginGame from "../server/utils/beginGame.js";
+import playBotMoves from "../server/utils/playBotMoves.js";
+import botFindValidCard from "@shared/gameLogic/botFindValidCard.js";
+import testPlayerMove from "./playerMoveTest.js";
 
 
 describe('endGameSinglePlayer',()=>{
-    it('single-player: attacker outOfCards, game - finished',()=>{
+    it('single-player: no playerid index out of bounds, attacker outOfCards, game - finished',()=>{
         const numberOfPlayers = 4
         const currentState:GameState = createGame(numberOfPlayers,'s')
         for(let i = 0;i<numberOfPlayers;i++){
@@ -29,10 +29,10 @@ describe('endGameSinglePlayer',()=>{
             }
         
         }
-        
+        const indexOutOfBounds = stateHistory.filter(state=>state.attackerId>=numberOfPlayers||state.defenderId>=numberOfPlayers)
         const lastState = stateHistory.pop()
         expect(lastState).toBeDefined()
-        
+        expect(indexOutOfBounds.length).toBe(0)
         expect(lastState?.finishOrder.length).toBe(numberOfPlayers)
         expect(lastState?.status).toBe('finished')
         const playersOutOfCards = lastState?.players.filter(player=>player.isOutOfCards)
@@ -83,6 +83,7 @@ describe('endGameSinglePlayer',()=>{
         const playerID = room.tokens.get(token)
         let stateHistory: GameView[] = []
         while(room.state.status !== "finished"){
+            console.log("Bot moves")
             stateHistory = stateHistory.concat(playBotMoves(room))
             console.log(room.state.players[room.state.players.length-1].cards)
             console.log(`----------------`)
