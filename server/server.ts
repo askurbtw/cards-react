@@ -70,7 +70,7 @@ const server = http.createServer(
 
       if (!room) {
         res.writeHead(409, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "Conflict" }));
+        res.end(JSON.stringify({ error: "No room found." }));
         return;
       }
       if (room.state.playersOnline === room.state.numberOfPlayers) {

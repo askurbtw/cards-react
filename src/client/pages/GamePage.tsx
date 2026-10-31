@@ -11,52 +11,54 @@ import { useNavigate } from 'react-router-dom'
 export default function GamePage() {
     const navigate = useNavigate()
     const { game, rejoin } = useGame()
-    const {socket, token} = useSocket()
-    const handleGoBack = () =>{
-        
-        navigate(`/` )
+    const { socket, token } = useSocket()
+    const handleGoBack = () => {
+
+        navigate(`/`)
     }
-   
+    const path = window.location.pathname
+    const roomID = path.split('/')[2]
     if (!game) {
         console.log("no game")
-        if(!socket){
+        if (!socket) {
             return (<div>
                 <h1>Loading...</h1>
             </div>)
         }
-        const path = window.location.pathname
-        const roomID = path.split('/')[2]
+
         console.log(roomID)
 
-        if(!roomID){
+        if (!roomID) {
             alert("Room undefined.")
-            navigate(`/` )
+            navigate(`/`)
         }
-        rejoin(roomID, token||'' )
-        
+        rejoin(roomID, token || '')
+
         return
         // return <Navigate to='/' replace />
     }
     const gameText = game.status === "waiting for players" ? `Waiting for ${game.numberOfPlayers - game.playersOnline} more players` :
-        game.currentId!==undefined && game.attackerId!==undefined && game.defenderId!==undefined ? game.currentId === game.attackerId
+        game.currentId !== undefined && game.attackerId !== undefined && game.defenderId !== undefined ? game.currentId === game.attackerId
             ? `${getPlayer(game.players, game.attackerId).name}'s turn against ${getPlayer(game.players, game.defenderId).name}`
             : `${getPlayer(game.players, game.currentId).name}'s turn`
             : ''
     console.log(gameText)
     if (game.status === "finished") {
         return (
-            <>
-                <h1>{`Winner is: ${getPlayer(game.players,game.finishOrder[0]).name}`}</h1>
-                <h2>Finish order</h2>
-                <ol>
-                    {game.finishOrder.map((player) => {
-                        return (
-                            <li>{getPlayer(game.players, player).name}</li>
-                        )
-                    })}
-                </ol>
-                <button onClick={handleGoBack}>Go back to home page.</button>
-            </>
+            <div id='game-page'>
+                <div id="game-grid">
+                    <div id='game-results-card'>
+                        <h1>{`Winner is: ${getPlayer(game.players, game.finishOrder[0]).name}`}</h1>
+                        <h2>Finish order</h2>
+                        <ol>
+                            {game.finishOrder.map((player) => {
+                                return (
+                                    <li>{getPlayer(game.players, player).name}</li>
+                                )
+                            })}
+                        </ol>
+                        <button id='back-btn' onClick={handleGoBack}>Go back to home page.</button></div></div>
+            </div>
         )
     }
 
@@ -69,9 +71,9 @@ export default function GamePage() {
                 {game.players.map((player, index) => {
                     return <PlayerComponent key={player.id} playerInfo={player} index={index} />
                 })}
-                
-                    <TableComponent deck={game.deck} text={gameText} currentCards={game.currentCards} leftovers={game.leftovers} />
-                
+
+                <TableComponent deck={game.deck} text={gameText} currentCards={game.currentCards} leftovers={game.leftovers} status={game.status} roomId={roomID} />
+
             </div>
         </div>
     </>)

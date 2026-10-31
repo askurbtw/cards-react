@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test":"vitest",
+    "test": "vitest",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -13,6 +13,7 @@
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\""
   },
   "dependencies": {
+    "@fontsource/montserrat": "^5.3.0",
     "express": "^5.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

@@ -4,6 +4,7 @@
 }
 
 body {
+    font-family: 'Montserrat', system-ui, sans-serif;
     width: 100dvh;
     height: 100dvh;
     margin: 0;
@@ -13,7 +14,9 @@ body {
 #home-page{
     width: 100%;
     height: 100%;
-    background-color: #0b132b;
+    background:radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+    radial-gradient(circle at center, #112150 0%, #101931 100%);
+    background-size: 16px 16px, 100% 100%;
 }
 #game-grid {
     display: grid;
@@ -274,6 +277,11 @@ img.attack-card{
     opacity: 0.25;
 }
 
+
+button, select, input{
+    font-family: 'Montserrat', system-ui, sans-serif;
+}
+
 @keyframes shake-card{
     0%,100% {transform: translateX(0px) rotateY(180deg);}
     20%,60% {transform: translateX(8px) rotate(3deg) rotateY(180deg);}
@@ -464,8 +472,8 @@ header{
     width: 100%;
     height: 10dvh;
     margin-bottom: 20px;
-    border-bottom: #323232 solid 2px;
-    background-color: #1c2541;
+    border-bottom: #323232 solid 1px;
+    background-color: #111d41cc;
 }
 nav{
     display: flex;
@@ -505,7 +513,7 @@ header ul{
     justify-content: space-evenly;
     align-items: center;
     height: 50dvh;
-    background-color: #1c2541;
+    background-color: #111d4199;
     
 }
 #game-settings-game-launch{
@@ -539,6 +547,8 @@ header ul{
 #players-select{
     color:white;
     background-color: #263A68;
+    border: solid 1px #4B5260;
+    border-radius: 5px;
 }
 #type-selection{
     
@@ -579,7 +589,7 @@ nav ul li{
 nav ul li button{
     font-weight: bold;
     color: rgb(105, 99, 99);
-    background-color:#1c2541;
+    background: none;
     display: flex;
     height: 100%;
     justify-content: center;
@@ -659,4 +669,89 @@ nav ul li button:hover{
 #player-4 #player-info{
     text-align: center;
     width: var(--card-long);
+}
+#room-id{
+    display: flex;
+    flex-direction: column;
+    color:#D4AA04;
+    align-items: center;
+    justify-content: center;
+}
+
+#room-id h4{
+    margin: 0;
+    
+}
+
+#room-id-plus-button{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+#room-id-plus-button h3{
+    margin: 0;
+    padding: 10px;
+    border: #D4AA0440 1px solid;
+    border-radius: 5px;
+}
+#room-id button{
+    color:#EFBF04;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: #EFBF04 1px solid;
+    background-color: #10162780;
+    height: 50%;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+#deck h5{
+    color: #D4AA04;
+    position: absolute;
+    top:0px;
+    margin: 0;
+}
+#game-results-card{
+    border-radius: 10px;
+    border: solid 2px #D4AA04;
+    background-color: #10162780;
+    grid-row: 2;
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+#game-results-card h1{
+    color:#D4AA04
+}
+#game-results-card h1::before{
+    content: "\1F451";
+}
+#game-results-card h1::after{
+    content: "\1F451";
+}
+ol{
+    margin: 0 0 20px 0;
+}
+#game-results-card h2{
+    color:white
+}
+ol li{
+    color:white
+}
+#back-btn{
+    color:#EFBF04;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: #EFBF04 1px solid;
+    background-color: #10162780;
+    padding: 20px;
+    border-radius: 5px;
 }
