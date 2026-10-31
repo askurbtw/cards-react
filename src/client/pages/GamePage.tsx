@@ -64,14 +64,14 @@ export default function GamePage() {
 
 
     return (<>
-        <div>
+        <div id='game-page'>
             <div id="game-grid">
                 {game.players.map((player, index) => {
                     return <PlayerComponent key={player.id} playerInfo={player} index={index} />
                 })}
-                <div id="cards-field">
+                
                     <TableComponent deck={game.deck} text={gameText} currentCards={game.currentCards} leftovers={game.leftovers} />
-                </div>
+                
             </div>
         </div>
     </>)

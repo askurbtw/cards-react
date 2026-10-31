@@ -17,15 +17,13 @@ export default function HomePage() {
     }
     return (
         <>
-            <div>
+            <div id='home-page'>
                 <header>
                     <nav>
-                        <div id="header-li">
                             <ul>
-                                <li><button className="game-btn" onClick={singlePlayerClick}>Single Player</button></li>
-                                <li><button className="game-btn" onClick={multiplayerClick}>Multiplayer</button></li>
+                                <li > {mode==='single'?<div className="focus-top"></div>:undefined} <button className={` ${mode==='single'?'focus':undefined}`} onClick={singlePlayerClick}>Single Player</button></li>
+                                <li > {mode==='multiplayer'?<div className="focus-top"></div>:undefined} <button className={` ${mode==='multiplayer'?'focus':undefined}`} onClick={multiplayerClick}>Multiplayer</button> </li>
                             </ul>
-                        </div>
                     </nav>
                 </header>
                 {mode==='single'?<SinglePlayerPage/>:<MultiPlayerPage/>}

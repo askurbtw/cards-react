@@ -14,7 +14,7 @@ import customDelay from "@shared/utils/customDelay";
 
 
 export const GameContextProvider = ({ children }: { children: ReactNode }) => {
-    const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+    const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
     const [numberOfPlayers, setNumberOfPlayers] = useState<number | null>(null)
     const [playerName, setPlayerName] = useState<string | null>(null)
     const [game, setGame] = useState<GameView | null>(null)

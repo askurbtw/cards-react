@@ -7,7 +7,7 @@ export default function MultiPlayerPage(): React.JSX.Element {
     const navigate = useNavigate()
     const [numberOfPlayers, setNumberOfPlayers] = useState<number | null>(null)
     const [playerName, setPlayerName] = useState<string>('')
-    const [type, setType] = useState<string>('')
+    const [type, setType] = useState<string>('create')
     const [joinRoomId, setJoinRoomId] = useState<string>('')
     const handleNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPlayerName(String(event.target.value))
@@ -52,15 +52,18 @@ export default function MultiPlayerPage(): React.JSX.Element {
 
     }
     return (
-        <div>
+        <div id='game-settings-game-launch'>
+            
             <div id="game-settings">
+                <div id="game-settings-text"><h2>Game settings</h2>
+                <h4>Configure game settings</h4></div>
                 <div id="name-div"><input className="name-input" onChange={handleNameInputChange} placeholder="Enter your name..." /></div>
                 <div id="type-selection">
-                    <button className="game-btn" onClick={handleTypeClick}>Join Game</button>
-                    <button className="game-btn" onClick={handleTypeClick}>Create Game</button>
+                    <button className={`game-btn ${type==='join'?'focus':undefined}`} onClick={handleTypeClick}>Join Game</button>
+                    <button className={`game-btn ${type==='create'?'focus':undefined}`} onClick={handleTypeClick}>Create Game</button>
                 </div>
                 {type === 'create' ?
-                    <div>
+                    <>
                         <div id="select-div">
                             <label htmlFor="players-select" id="players-label"
                             >Select number of players
@@ -73,16 +76,16 @@ export default function MultiPlayerPage(): React.JSX.Element {
                             </select>
                         </div>
                         <div id="game-launch">
-                            <button className="game-btn" onClick={handleCreateClick}>Start Game</button>
+                            <button className="game-btn white" onClick={handleCreateClick}>Start Game</button>
                         </div>
-                    </div> :
+                    </> :
                     type === 'join' ?
-                        <div>
+                        <>
                             <div id="name-div"><input className="name-input" onChange={handleRoomInputChange} placeholder="Enter room ID..." /></div>
                             <div id="game-launch">
-                                <button className="game-btn" onClick={handleJoinClick}>Join</button>
+                                <button className="game-btn white" onClick={handleJoinClick}>Join</button>
                             </div>
-                        </div>
+                        </>
                         : null
                 }
 

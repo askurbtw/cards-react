@@ -8,7 +8,7 @@ interface CardsContainerComponentProps{
 
 export default function CardsContainerComponent({index,attackCard,defenceCard}: CardsContainerComponentProps) {
     return(
-        <div id = {`cards-${index}`}>
+        <div id = {`cards-${index}`} className="black-transparent padding-10px">
             {attackCard && <div >
                 <img src={`/images/cards/${attackCard.value}_of_${attackCard.suit}.svg`} alt="" className = "attack-card" />
                 </div>}

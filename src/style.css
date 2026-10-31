@@ -4,14 +4,17 @@
 }
 
 body {
-    width: 100%;
-    height: 100%;
-    background-color: #35654D;
+    width: 100dvh;
+    height: 100dvh;
     margin: 0;
     padding: 0;
     overflow: hidden;
 }
-
+#home-page{
+    width: 100%;
+    height: 100%;
+    background-color: #0b132b;
+}
 #game-grid {
     display: grid;
     width: 100dvw;
@@ -23,21 +26,21 @@ body {
 
 #field {
     display: flex;
-    background-color: #005A12;
     border-radius: 30px;
-    border: solid 20px #7A2C00;
     height: 100%;
     width: 100%;
-    box-shadow: 0px 1px 5px black;
+    
     box-sizing: border-box;
     flex-direction: column;
     
 }
 
 #cards-field {
+    border-radius: 10px;
+    border: solid 2px #D4AA04;
+    background-color: #10162780;
     grid-row: 2;
     grid-column: 2;
-    
 }
 
 /* Спільні стилі для всіх списків карток */
@@ -60,8 +63,9 @@ body {
     grid-row: 3;
     grid-column: 2;
     display: flex;
-    justify-content: center;
-    align-items: flex-end; /* Картки притиснуті до нижнього краю гриду */
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center; /* Картки притиснуті до нижнього краю гриду */
 }
 
 #player-1 ul {
@@ -81,8 +85,9 @@ body {
     grid-row: 1;
     grid-column: 2;
     display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Картки притиснуті до верхнього краю гриду */
+    justify-content: flex-end;
+    align-items: center; 
+    flex-direction: column-reverse;
 }
 
 #player-3 ul {
@@ -97,17 +102,28 @@ body {
     grid-column: 1;
     display: flex;
     justify-content: flex-start;
-    align-items: center;      
-     /* Відцентровано по вертикалі */
+    align-items: flex-start;  
+    position:relative;    
+    
+    flex-direction: column;
 }
+#player-2 .cards-wrapper,
+#player-4 .cards-wrapper{
+    width: var(--card-long);
+    height: 35vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 
 /* --- ГРАВЕЦЬ 3 (Правий) --- */
 #player-4 {
     grid-row: 2;
     grid-column: 3;
     display: flex;
-    justify-content: flex-end;
-    align-items: center;    
+    flex-direction: column;
+    align-items: flex-end;    
         /* Відцентровано по вертикалі */
 }
 
@@ -122,12 +138,12 @@ body {
 
 #cards-field h2{
     text-align: center;
-    color:yellowgreen;
-    background-color: black;
+    color:#EFBF04;
+    margin: 20px 0 10px 0;
     
 }
 #game-field {
-    background-color: black;
+    
     flex: 3;
     display:grid;
     grid-template-columns: 2fr 1fr;
@@ -150,18 +166,22 @@ body {
  position: relative;
  width: var(--card-short);
     height: var(--card-long);
-    
 }
 #cards-part-of-field img{
     position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 80%;
+  height: 80%;
+  box-shadow: 0px 0px 10px #0b132b40;
   object-fit: contain;
   transition: transform 0.3s ease; /* Плавний поворот */
 }
-
+#cards-part-of-field img.defence-card{
+    z-index: 2;
+    transform: translateX(-50%) translateY(-50%) translate(10px, -3px) rotate(12deg);
+}
 #cards-2{
 grid-row:1;
  grid-column:2;
@@ -197,10 +217,7 @@ grid-row:2;
  width: var(--card-short);
     height: var(--card-long);
 }
-#deck{
-    grid-row:1;
-    grid-column: 4;
-}
+
 #leftovers{
     grid-row:2;
     grid-column: 4;
@@ -211,12 +228,16 @@ grid-row:2;
     grid-template-rows: 1fr 1fr;
     justify-content: center;
     align-items: center;
-    border-left: solid 2px red;
+    
 }
 #deck{
+    align-self: center;
+    justify-self: center;
     grid-row:1;
     grid-column: 1;
     display: flex;
+    width: 40%;
+    height: 100%;
     justify-content: center;
     align-items: center;
     position: relative;
@@ -224,24 +245,25 @@ grid-row:2;
 #leftovers{
     grid-row:2;
     grid-column: 1;
+    height: 80%;
+    width: 40%;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    align-self: center;
+    justify-self: center;
     
 }
 
 img.attack-card{
     z-index: 1;
 }
-img.defence-card{
-    z-index: 2;
-    transform: translate(8px, 4px) rotate(12deg);
-}
+
 
 .deck-card{
     position: absolute;
-    transform: translateY(calc(var(--i) * 4px)) rotate(90deg);
+    transform: translateY(calc((var(--i) + 1) * 4px)) rotate(90deg);
 
 }
 
@@ -265,7 +287,7 @@ img.defence-card{
 }
 
 .hidden{
-    display: none;
+    visibility: hidden;
 }
 
 
@@ -332,15 +354,13 @@ cursor: pointer;}
 #player-2.hand ul {
     transform: rotate(90deg);
     transform-origin: center;
-    /* Pulls the rotated bounding box flush against the left edge */
-    margin-left: calc((var(--card-long) - 35vh) / 2); 
 }
 
 #player-4.hand ul {
     transform: rotate(-90deg);
     transform-origin: center;
     /* Pulls the rotated bounding box flush against the right edge */
-    margin-right: calc((var(--card-long) - 35vh) / 2); 
+    
 }
 
 /* ============================================================
@@ -425,115 +445,218 @@ cursor: pointer;}
 .rotate180{
     transform: rotateY(180deg);
 }
-
-
-header{
-    background-color: antiquewhite;
-    border-radius: 20px;
-    border:solid 3px #83FF3B;
-    width: 100%;             /* Розтягує хедер на всю ширину екрана */
-    box-sizing: border-box;  /* Запобігає виходу за межі екрана через padding */
+html{
+    height: 100%;
+}
+body{
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 30px 0;
+
+}
+#root{
     
+    width: 100%;
+}
+header{
+    display: flex;
+    width: 100%;
+    height: 10dvh;
+    margin-bottom: 20px;
+    border-bottom: #323232 solid 2px;
+    background-color: #1c2541;
+}
+nav{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
 }
 header ul{
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 200px;
-    width: 100%;
+    gap:10rem;
+    padding: 0px 20px 0px 20px;
+    margin: 0;
+    list-style: none;
+}
+.game-btn{
+    color:#4B5260;
+    font-weight: bold;
+    background-color: #263A68;
+    padding: 20px;
+    border: none;
+    border-radius: 5px;
+}
+.focus{
+    color: white;
+}
+#game-settings{
+    width: 25%;
+    border: 1px solid #36415A;
+    border-radius: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 50dvh;
+    background-color: #1c2541;
+    
+}
+#game-settings-game-launch{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 100px;
+}
+
+.name-input{
+    color:white;
+    font-weight: bold;
+    background-color: #263A68;
+    border: none;
+    border-radius: 5px;
+    padding: 15px;
+    
+}
+.name-input::placeholder{
+   color:#4B5260;
+   font-weight: bold; 
+}
+#select-div{
+    display: flex;
+    color:white;
+    font-weight: bold;
+    gap:20px;
+    
+}
+#players-select{
+    color:white;
+    background-color: #263A68;
+}
+#type-selection{
+    
+    display: flex;
+    flex-direction: row;
+    gap:10px
+}
+
+#game-launch{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+#game-settings-text{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+}
+#game-settings-text h2{
+    color:white;
+    font-weight: bold;
     padding: 0;
     margin: 0;
 }
-
-#header-li li{
-    
-    list-style: none;
-    
-    
+#game-settings-text h4{
+    color:#4B5260;
+    padding: 0;
+    margin: 0;
 }
-#header-li h2{
+nav ul li{
+    position:relative;
+    height: 100%;
+}
+nav ul li button{
     font-weight: bold;
-}
-nav {
-    width: 100%;             /* Розтягує nav на всю ширину хедера */
+    color: rgb(105, 99, 99);
+    background-color:#1c2541;
     display: flex;
+    height: 100%;
     justify-content: center;
-}
-#game-settings{
-    border:solid 3px #83FF3B;
-    background-color: antiquewhite;
-    border-radius: 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
     align-items: center;
-    padding: 20px 0px 400px 0px;
-    margin:25px 0 25px 0;
-    gap: 50px;
+    border:none
 
 }
-#players-label{
-    background-color: #83FF3B;
-    padding:10px 10px;
-    border-radius: 10px;
-    margin:0 5px 0 0;
-    font-weight: bold;
-    border: solid 2px;
+
+
+
+nav ul li button:hover{
+    color:white
 }
-#players-select{
-    color:#2F2F2F;
-    font-weight: normal;
-    background-color: bisque;
-    padding: 10px 3px;
-    border-radius: 4px;
-    border: solid 2px;
-    cursor:pointer;
-    
+#game-launch .game-btn:hover{
+    color:#0037ff
 }
-#players-select:hover{
-    border-color: aqua;
-}
-#game-launch{
-    background-color: antiquewhite;
-    
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    padding:50px
-}
-.game-btn{
-    background-color: #83FF3B;
+
+.focus-top{
+    background-color:#0037ff;
+    position: absolute;
+    top:0px;
+    height: 3%;
+    width: 90%;
+    z-index: 10;
     border-radius: 5px;
-    border: solid 2px;
-    padding:20px;
-    font-weight: bold;
+    box-shadow: 0 2px 10px #3959bb;
+    left:50%;
+    transform: translateX(-50%);
 }
-.name-input{
-    outline: none;
-    background-color:rgb(251, 207, 48);
-    border:solid 2px;
-    border-radius: 3px;
+#name-div h4{
+    margin:0 0 3px 0;
+    color:white
+}
+.white{
+    color:white
+}
+#player-1 #player-info{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap:30px;
+    width: 100%;
+}
+#pass-btn{
+    color:#EFBF04;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: #EFBF04 1px solid;
+    background-color: #10162780;
+    height: 50%;
+    padding: 20px;
+    border-radius: 5px;
+    
+}
+#game-page{
+    width: 100%;
+    height: 100%;
+    background:radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+    radial-gradient(circle at center, #101b3d 0%, #030712 100%);
+    background-size: 16px 16px, 100% 100%;
+}
+.black-transparent{
+    border:  #D4AA0440 1px solid;
+    border-radius: 10px;
+    background-color: #15133540;
+}
+.padding-10px{
+    padding: 10px;
+}
+#game-text{
+    padding-bottom: 20px;
+}
+#player-2 #player-info,
+#player-4 #player-info{
     text-align: center;
-    font-weight: bold;
-    color: #2D2D2D;
+    width: var(--card-long);
 }
-.name-input::placeholder{
-    color:#2D2D2D;
-    font-weight: bold;
-    text-align: center;
-    transition: color 0.1s ease;
-}
-.name-input:focus{
-    border:solid 2px #83FF3B !important
-}
-.name-input:focus::placeholder{
-    color:transparent
-}
-
-
-
-

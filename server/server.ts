@@ -1,7 +1,7 @@
 import http, { IncomingMessage, ServerResponse } from "http";
-import { type Room } from "../shared/types/index.js";
 import { randomUUID } from "node:crypto";
 import createGame from "../shared/gameLogic/createGame.js";
+import { type Room } from "../shared/types/index.js";
 import type CreateRoomRequest from "../shared/types/createroomtype.types.ts";
 import broadcastState from "./utils/broadcastState.js";
 import checkValidCard from "../shared/gameLogic/checkValidCard.js";

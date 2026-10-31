@@ -44,7 +44,11 @@ export default function PlayerComponent({ index,playerInfo }: PlayerComponentPro
 
     return (
         <div id={`player-${index+1}`} className="hand">
-            <h6>{playerInfo.name}</h6>
+            <div id='player-info'>
+                <h2 className="white">{playerInfo.name}</h2>
+                {playerInfo.id === myPlayerId && <button id="pass-btn" onClick={handlePass} className={game?.disablePassButton?`hidden`:undefined}>Pass</button>}
+            </div>
+            <div className="cards-wrapper">
             <ul style={{ '--count': count } as React.CSSProperties}>
                 {playerInfo.cards.map((card, index) => {
                     return (
@@ -58,8 +62,7 @@ export default function PlayerComponent({ index,playerInfo }: PlayerComponentPro
                         }} />
                     )
                 })}
-            </ul>
-            {playerInfo.id === myPlayerId && <button id="pass-btn" onClick={handlePass} className={game?.disablePassButton?`hidden`:undefined}>Pass</button>}
+            </ul></div>
         </div>
     )
 

@@ -35,7 +35,7 @@ export default function TableComponent({ deck, text, currentCards, leftovers }: 
         <div id="cards-field">
             <div id="field">
                 <div id="game-text">
-                    {text}
+                    <h2>{text}</h2>
                 </div>
                 <div id="game-field">
                     <div id="cards-part-of-field">
@@ -45,7 +45,7 @@ export default function TableComponent({ deck, text, currentCards, leftovers }: 
                     </div>
                     <div id="deck-part-of-field">
                         <DeckComponent deck={deck} />
-                        <div id="leftovers">
+                        <div id="leftovers" className="black-transparent">
                             {[...Array(leftovers)].map((_, index) => {
                                 return <div className="deck-card" key={`${index} `} style={{ '--i': index } as React.CSSProperties}>
                                     <img src="/images/cards/reverse_card.svg" alt="" />

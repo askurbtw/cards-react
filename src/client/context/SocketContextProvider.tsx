@@ -6,7 +6,7 @@ import type SocketContextType from "@shared/types/socketcontexttype.types";
 
 
 export const SocketContextProvider = ({ children }: { children: ReactNode }) => {
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
     const [token, setToken] = useState<string| null>(()=>{
         return window.localStorage.getItem("token")
     })

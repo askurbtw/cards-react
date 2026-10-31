@@ -27,8 +27,10 @@ export default function SinglePlayerPage():React.JSX.Element{
 
     }
     return (
-        <div>
+        <div id='game-settings-game-launch'>
             <div id="game-settings">
+                <div id="game-settings-text"><h2>Game settings</h2>
+                <h4>Configure game settings</h4></div>
                     <div id="name-div"><input className="name-input" onChange={handleInputChange} placeholder="Enter your name..." /></div>
                     <div id="select-div">
                         <label htmlFor="players-select" id="players-label"
@@ -41,10 +43,11 @@ export default function SinglePlayerPage():React.JSX.Element{
                             <option value="4">4</option>
                         </select>
                     </div>
+                    <div id="game-launch">
+                    <button className="game-btn white" onClick={handleClick}>Start Game</button>
                 </div>
-                <div id="game-launch">
-                    <button className="game-btn" onClick={handleClick}>Start Game</button>
                 </div>
+                
         </div>
     )
 }
