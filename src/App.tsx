@@ -2,6 +2,7 @@ import HomePage from './client/pages/HomePage'
 import GamePage from './client/pages/GamePage'
 import { GameContextProvider } from './client/context/GameContextProvider'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { SocketContextProvider } from './client/context/SocketContextProvider'
 const router = createBrowserRouter([{
   path: '/',
   element: <HomePage />
@@ -12,9 +13,10 @@ const router = createBrowserRouter([{
 }])
 function App() {
   return (
+    <SocketContextProvider>
     <GameContextProvider>
       <RouterProvider router={router} />
-    </GameContextProvider>
+    </GameContextProvider></SocketContextProvider>
   )
 }
 

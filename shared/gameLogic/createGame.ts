@@ -1,21 +1,23 @@
-import { type GameState } from "../types/index.ts";
+import { type Deck, type GameState, type Player } from "../types/index.ts";
 import createDeck from "./createDeck.ts";
-import { initializePlayers } from "./initializePlayers.ts";
-export default function createGame(numberOfPlayers:number, playerName:string) : GameState  {
-    const deck = createDeck()
-    const [players, newDeck] = initializePlayers(numberOfPlayers, playerName, deck)
+export default function createGame(numberOfPlayers:number, gameType:'s' | 'm') : GameState  {
+    const deck : Deck = createDeck()
+    const players : Player[] = []
     return {
+        numberOfPlayers,
         players:players,
-        deck:newDeck,
+        deck,
         currentCards:[],
-        attackerId:players[0].id,
-        defenderId:players[1].id,
-        currentId:players[0].id,
+        attackerId:0,
+        defenderId:0,
+        currentId:0,
         leftovers:[],
         movesCounter:1,
         disablePassButton:true,
-        status: 'playing',
+        status: "waiting for players",
         finishOrder: [],
+        playersOnline:0,
+        isSinglePlayer:gameType==='s'?true:false
     }
 
 }

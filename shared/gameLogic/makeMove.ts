@@ -31,6 +31,7 @@ export default function makeMove(
     currentCardsCopy.push(cardToDeck);
     nextPlayerId = state.attackerId;
     moveNumber++;
+    
   }
   
 
