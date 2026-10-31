@@ -39,13 +39,13 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             }
 
         })
-        
+
         return () => {
             console.log("Unmounting")
             socket.removeAllListeners()
         }
 
-    }, [ socket])
+    }, [socket])
 
     const joinRoomAsync = (data: { state: GameView, roomId: string, playerName: string }, gameType: 's' | 'm') => {
         if (!socket) {
@@ -56,36 +56,36 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         console.log(socket)
         console.log(data.roomId)
         return new Promise<void>((resolve, reject) => {
-            if(!gameType) return reject("GameType was not specified.")
-                const emitRoute = gameType==='m'?'join_room':'single_player'
-            
-                socket.emit(emitRoute, { roomId: data.roomId, playerName: data.playerName }, (response: SocketResponse) => {
-                    if (response.error) {
-                        return reject(new Error(response.error))
-                    }
-                    console.log("Emitting")
-                    const playerID = response.data.playerID
-                    setMyPlayerId(playerID)
-                    const players = [...data.state.players.slice(playerID), ...data.state.players.slice(0, playerID)]
-                    const stateCopy = structuredClone(data.state)
-                    stateCopy.players = players
-                    setGame(stateCopy)
-                    updateToken(response.data.token)
-                    setNumberOfPlayers(data.state.numberOfPlayers)
-                    console.log(data)
-                    return resolve()
+            if (!gameType) return reject("GameType was not specified.")
+            const emitRoute = gameType === 'm' ? 'join_room' : 'single_player'
 
-                })
+            socket.emit(emitRoute, { roomId: data.roomId, playerName: data.playerName }, (response: SocketResponse) => {
+                if (response.error) {
+                    return reject(new Error(response.error))
+                }
+                console.log("Emitting")
+                const playerID = response.data.playerID
+                setMyPlayerId(playerID)
+                const players = [...data.state.players.slice(playerID), ...data.state.players.slice(0, playerID)]
+                const stateCopy = structuredClone(data.state)
+                stateCopy.players = players
+                setGame(stateCopy)
+                updateToken(response.data.token)
+                setNumberOfPlayers(data.state.numberOfPlayers)
+                console.log(data)
+                return resolve()
 
-            
-            
+            })
+
+
+
 
         })
     }
     const makeMoveAsync = (cardId: string): Promise<string> => {
         return new Promise((resolve, reject) => {
             if (!socket) {
-                
+
                 reject('No socket');
                 return 'No socket'
             }
@@ -94,73 +94,90 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
                 if (response.error) {
                     console.log(response.error)
                     return reject(response.error)
-                    
+
                 }
                 resolve('Success.')
             })
         })
     }
     const startGame = async (numberOfPlayers: number, playerName: string, gameType: 's' | 'm'): Promise<string> => {
-        if (!socket) {
-            console.log(`Socket error.`)
-            return 'Socket error.'
-        }
-        setNumberOfPlayers(numberOfPlayers)
-        setPlayerName(playerName)
-        const response = await fetch(`${API_URL}/routes/create/room`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                numberOfPlayers,
-                playerName,
-                gameType
+        try {
+            if (!socket) {
+                throw new Error('Socket error')
+
+            }
+            setNumberOfPlayers(numberOfPlayers)
+            setPlayerName(playerName)
+            const response = await fetch(`${API_URL}/routes/create/room`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    numberOfPlayers,
+                    playerName,
+                    gameType
+                })
             })
-        })
-        if (!response.ok) {
-            throw new Error('Server error')
+            if (!response.ok) {
+                throw new Error('Server error')
+
+            }
+            const data = await response.json();
+            await joinRoomAsync({ state: data.state, roomId: data.roomId, playerName }, gameType)
+            console.log("resolved")
+            return data.roomId
         }
-        const data = await response.json();
-        await joinRoomAsync({ state: data.state, roomId: data.roomId, playerName }, gameType)
-        console.log("resolved")
-        return data.roomId
+        catch (error) {
+            console.log(error)
+            throw new Error('Server error', { cause: error });
+        }
 
     }
     const joinGame = async (playerName: string, roomID: string, gameType: 's' | 'm'): Promise<string> => {
-        if (!socket) return 'Socket error.'
-        const response = await fetch(`${API_URL}/routes/join/room/${roomID}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                playerName
+        try {
+            if (!socket) {
+                throw new Error('Socket error. Maybe render service is waking up, try again later.')
+            }
+            const response = await fetch(`${API_URL}/routes/join/room/${roomID}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    playerName
+                })
             })
-        })
-        if (!response.ok) {
-            throw new Error('Server error')
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                const errorMessage = errorData?.error || `HTTP error! status: ${response.status}`;
+                throw new Error(errorMessage, {cause:errorData})
+            }
+            setPlayerName(playerName)
+            const data = await response.json();
+            await joinRoomAsync({ state: data.state, roomId: data.roomId, playerName }, gameType)
+            return data.roomId
         }
-        setPlayerName(playerName)
-        const data = await response.json();
-        await joinRoomAsync({ state: data.state, roomId: data.roomId, playerName }, gameType)
-        return data.roomId
+        catch (error) {
+            console.log(error)
+            throw new Error('Server error', { cause: error });
+        }
     }
 
     const applyMove = async (cardID: string): Promise<string> => {
-        
+
         if (!game || !socket) return 'Game or socket is not defined.'
-        try{
+        try {
             const result = await makeMoveAsync(cardID)
             console.log(result)
             return result
         }
-        catch(err){
+        catch (err) {
             console.log(err)
-            if(err==='Invalid move.') return err
+            if (err === 'Invalid move.') return err
         }
         return ''
-        
+
     }
 
     const applyPass = (): string => {

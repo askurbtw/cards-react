@@ -21,8 +21,8 @@ export default function HomePage() {
                 <header>
                     <nav>
                             <ul>
-                                <li > {mode==='single'?<div className="focus-top"></div>:undefined} <button className={` ${mode==='single'?'focus':undefined}`} onClick={singlePlayerClick}>Single Player</button></li>
-                                <li > {mode==='multiplayer'?<div className="focus-top"></div>:undefined} <button className={` ${mode==='multiplayer'?'focus':undefined}`} onClick={multiplayerClick}>Multiplayer</button> </li>
+                                <li > {mode==='single'?<div className="focus-top"></div>:undefined} <button className={` ${mode==='single'?'focus':undefined}`} onClick={singlePlayerClick}><h3>Single Player</h3></button></li>
+                                <li > {mode==='multiplayer'?<div className="focus-top"></div>:undefined} <button className={` ${mode==='multiplayer'?'focus':undefined}`} onClick={multiplayerClick}><h3>Multiplayer</h3></button> </li>
                             </ul>
                     </nav>
                 </header>

@@ -27,9 +27,15 @@ export default function MultiPlayerPage(): React.JSX.Element {
             alert(`Player name was not assigned.`)
             return
         }
+        try{
         const roomId = await startGame(numberOfPlayers, playerName, "m")
-        console.log(roomId)
         navigate(`/GamePage/${roomId}`)
+        }
+        catch(error){
+            console.log(error)
+            alert('Error occured during game creating. Maybe render service is waking up, try again later.')
+            return
+        }
 
     }
     const handleTypeClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -47,8 +53,20 @@ export default function MultiPlayerPage(): React.JSX.Element {
             alert(`Room id was not assigned.`)
             return
         }
+        try{
         const roomId = await joinGame(playerName, joinRoomId, "m")
         navigate(`/GamePage/${roomId}`)
+        }
+        catch(error){
+            if(error instanceof Error){
+                console.log(error)
+                alert(error.cause)
+                return
+            }
+            console.log(error)
+            alert('Error occured during game joining. Maybe render service is waking up, try again later.')
+            return
+        }
 
     }
     return (
