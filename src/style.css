@@ -1,6 +1,6 @@
 :root {
-    --card-short: 9vmin;
-    --card-long: calc(9vmin * 1.4); /* ≈ 12.6vmin */
+    --card-short: 7vmin;
+    --card-long: calc(7vmin * 1.4); /* ≈ 12.6vmin */
 }
 
 body {
@@ -17,6 +17,7 @@ body {
     background:radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
     radial-gradient(circle at center, #112150 0%, #101931 100%);
     background-size: 16px 16px, 100% 100%;
+    
 }
 #game-grid {
     display: grid;
@@ -44,6 +45,11 @@ body {
     background-color: #10162780;
     grid-row: 2;
     grid-column: 2;
+    align-self: center;
+    justify-self: center;
+    width: clamp(30%,70%,100%);
+    max-height: 100%;
+    min-height: 20%;
 }
 
 /* Спільні стилі для всіх списків карток */
@@ -78,7 +84,7 @@ body {
 #player-1 ul li img,
 #player-3 ul li img {
     width: var(--card-short);
-    height: var(--card-long);
+    height: calc(var(--card-long) + 2);
     display: block;
     object-fit: contain;
 }
@@ -142,7 +148,7 @@ body {
 #cards-field h2{
     text-align: center;
     color:#EFBF04;
-    margin: 20px 0 10px 0;
+    
     
 }
 #game-field {
@@ -234,16 +240,24 @@ grid-row:2;
     
 }
 #deck{
-    align-self: center;
-    justify-self: center;
+    
     grid-row:1;
     grid-column: 1;
     display: flex;
-    width: 40%;
+    width: clamp(8vmin, 11vmin, 20vmin);
     height: 100%;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
+    font-size: clamp(0.3rem, 1.5vw, 1rem);
+    align-self: center;
+    justify-self: flex-end;
+    right: 10%;
+    
+}
+#player-info{
+    font-size: clamp(0.3rem, 1.5vw, 1rem);
 }
 #leftovers{
     grid-row:2;
@@ -255,8 +269,9 @@ grid-row:2;
     align-items: center;
     position: relative;
     align-self: center;
-    justify-self: center;
-    
+    justify-self: flex-end;
+    width: clamp(8vmin, 11vmin, 20vmin);
+    right: 10%;
 }
 
 img.attack-card{
@@ -266,7 +281,8 @@ img.attack-card{
 
 .deck-card{
     position: absolute;
-    transform: translateY(calc((var(--i) + 1) * 4px)) rotate(90deg);
+    transform: translateY(calc((var(--i) + 1) * 1.5px)) rotate(90deg);
+    box-shadow: 1px 0px 2px black;
 
 }
 
@@ -328,7 +344,7 @@ cursor: pointer;}
     --spacing: clamp(3vmin, calc(18vmin / var(--c)), 5vmin);
     --x: calc(var(--offset) * var(--spacing));
 
-    --angle-step: clamp(6deg, calc(35deg / var(--c)), 12deg);
+    --angle-step: clamp(4deg, calc(33deg / var(--c)), 10deg);
     --angle: calc(var(--angle-step) * var(--offset));
     --y: calc(var(--offset) * var(--offset) * 0.25vmin);
 
@@ -390,13 +406,7 @@ cursor: pointer;}
     width: var(--card-short);
     height: var(--card-long);
 }
-#player-1 ul li img,
-#player-3 ul li img {
-    width: var(--card-short);
-    height: var(--card-long);
-    display: block;
-    object-fit: contain;
-}
+
 .hand li img {
     width: var(--card-short);
     height: var(--card-long);
@@ -506,6 +516,8 @@ header ul{
 }
 #game-settings{
     width: 25%;
+    max-width: 500px;
+    min-width: 250px;
     border: 1px solid #36415A;
     border-radius: 5%;
     display: flex;
@@ -513,6 +525,7 @@ header ul{
     justify-content: space-evenly;
     align-items: center;
     height: 50dvh;
+    padding: clamp(16px, 4vw, 32px);
     background-color: #111d4199;
     
 }
@@ -542,6 +555,8 @@ header ul{
     color:white;
     font-weight: bold;
     gap:20px;
+    flex-wrap: nowrap;
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
     
 }
 #players-select{
@@ -663,8 +678,15 @@ nav ul li button:hover{
     padding: 10px;
 }
 #game-text{
-    padding-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(0.1vw, 0.8vw, 2rem);
+    height: 10%;
+    white-space: nowrap;
+    margin: 1% 0 10% 0;
 }
+
 #player-2 #player-info,
 #player-4 #player-info{
     text-align: center;
@@ -676,6 +698,12 @@ nav ul li button:hover{
     color:#D4AA04;
     align-items: center;
     justify-content: center;
+    font-size: clamp(0.1vw, 0.6vw, 1rem);
+    width: 75%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    
 }
 
 #room-id h4{
@@ -704,14 +732,13 @@ nav ul li button:hover{
     border: #EFBF04 1px solid;
     background-color: #10162780;
     height: 50%;
-    padding: 20px;
+    padding: clamp(1vw, 14px, 16px);
     border-radius: 5px;
+    font-size: clamp(0.1vw, 0.6vw, 1rem);
 }
 
 #deck h5{
     color: #D4AA04;
-    position: absolute;
-    top:0px;
     margin: 0;
 }
 #game-results-card{
@@ -754,4 +781,10 @@ ol li{
     background-color: #10162780;
     padding: 20px;
     border-radius: 5px;
+}
+.img{
+    min-width: 70;
+    min-height: 92;
+    
+    width: clamp(70px, var(--card-short),  );
 }
