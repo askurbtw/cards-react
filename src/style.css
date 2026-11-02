@@ -178,6 +178,10 @@ body, html {
     grid-template-rows: 1fr 1fr;
     justify-items: center;
     align-items: center;
+    margin:5px
+}
+#cards-part-of-field div{
+    margin : 5px 0 5px 0
 }
 #cards-1{
  grid-row:1;
@@ -683,9 +687,10 @@ nav ul li button:hover{
     
 }
 .black-transparent{
-    border:  #D4AA0440 1px solid;
+    border:  #D4AA0480 1px solid;
     border-radius: 10px;
     background-color: #15133540;
+    padding: clamp(1px,3px,6px)
     
 }
 input{
@@ -755,6 +760,11 @@ input{
     color: #D4AA04;
     margin: 0;
 }
+#deck img,
+#leftovers img {
+    width:calc(9vmin);
+    height:calc(9vmin * 1.4);
+}
 #game-results-card{
     border-radius: 10px;
     border: solid 2px #D4AA04;
@@ -822,10 +832,29 @@ ol li{
     justify-content: flex-end;
     align-items: flex-start;
 }
-@media (max-width: 768px) {
+@media (max-width: 695px) {
     #cards-part-of-field {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(3, 1fr);
+    }
+    #cards-part-of-field div{
+    margin : 2px 0 2px 0
+    }
+    #cards-3{
+        grid-row: 2;
+        grid-column: 1;
+    }
+    #cards-4{
+        grid-row: 2;
+        grid-column: 2;
+    }
+    #cards-5{
+        grid-row: 3;
+        grid-column: 1;
+    }
+    #cards-6{
+        grid-row: 3;
+        grid-column: 2;
     }
 }
 
