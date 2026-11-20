@@ -14,6 +14,8 @@ import playBotMoves from "./utils/playBotMoves.js";
 import gameView from "./utils/gameView.js";
 import beginGame from "./utils/beginGame.js";
 import endRound from "../shared/gameLogic/endRound.js";
+import connectRedis from "./utils/connectRedis.js";
+import type { RedisClientType } from "redis";
 
 const PORT = Number(process.env.PORT) || 8000 ;
 const ALLOWED_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173'
@@ -27,9 +29,18 @@ const getRoom = (req: IncomingMessage, regex: RegExp): Room | undefined => {
   return undefined;
 };
 
+let redisClient: RedisClientType | null = null
+try{
+  redisClient = await connectRedis()
+}
+catch(err){
+  console.error(err)
+  process.exit(1)
+}
+
 const server = http.createServer(
   async (req: IncomingMessage, res: ServerResponse) => {
-    res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN)
+  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN)
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   res.setHeader('Vary', 'Origin')
