@@ -2,7 +2,8 @@
 
 A real-time multiplayer version of the classic card game **Durak** (36-card deck), built with React, TypeScript and Node.js. Play against bots, or share a room link with friends.
 
-**Live demo:** https://cards-react-petprojects.vercel.app · **Repository:** https://github.com/askurbtw/cards-react
+**Live demo:** https://cards-react-petprojects.vercel.app **(If an alert popup regarding render service pops up, please wait 30 seconds, it will spin up).**
+**Repository:** https://github.com/askurbtw/cards-react
 
 **Game UI:** ![Screenshot](readme_images/game_running.png)
 
@@ -127,3 +128,4 @@ The project started as a plain **HTML, CSS and JavaScript** game. As the UI stat
 
 - UI polish and card animations.
 - Optional accounts and game history.
+- Leaderboard.

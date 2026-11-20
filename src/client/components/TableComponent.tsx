@@ -15,22 +15,26 @@ interface TableComponentProps {
 
 export default function TableComponent({ deck, text, currentCards, leftovers, status, roomId }: TableComponentProps) {
     const pairedMoves = useMemo(() => {
-        const map = new Map()
+        const map = new Map<number, { attackCard: DeckCard | null, defenceCard: DeckCard | null }>()
         currentCards.forEach((card) => {
             const { moveType, moveNumber } = card
             if (!map.has(moveNumber)) {
-                map.set(moveNumber, { moveNumber })
+                map.set(moveNumber, { attackCard: null, defenceCard: null })
             }
             const pair = map.get(moveNumber)
-            if (moveType === "attack") {
-                pair.attackCard = card.card
-            }
-            if (moveType === "defence") {
-                pair.defenceCard = card.card
+            if (pair) {
+                if (moveType === "attack") {
+                    pair.attackCard = {card: card.card,
+                        moveType,moveNumber} 
+                }
+                if (moveType === "defence") {
+                    pair.defenceCard = {card: card.card,
+                        moveType,moveNumber} 
+                }
             }
 
         })
-        return Array.from(map.values()).sort((a, b) => a.moveNumber - b.moveNumber)
+        return map
     }, [currentCards])
     const handleCopy = async (textToCopy: string) => {
         try {
@@ -55,14 +59,16 @@ export default function TableComponent({ deck, text, currentCards, leftovers, st
                 </div> : undefined}
                 <div id="game-field">
                     <div id="cards-part-of-field">
-                        {pairedMoves.map((cards) => {
-                            return <CardsContainerComponent index={cards.moveNumber} key={`${cards.moveNumber} ${cards.attackCard}_${cards.defenceCard}`} attackCard={cards.attackCard} defenceCard={cards.defenceCard} />
+                        {Array.from({length:6},(_,index)=>{
+                            return index+1
+                        }).map((index) => {
+                            return <CardsContainerComponent index={index} key={`${index} ${pairedMoves.get(index)?.attackCard}_${pairedMoves.get(index)?.defenceCard}`} attackCard={pairedMoves.get(index)?.attackCard?.card} defenceCard={pairedMoves.get(index)?.defenceCard?.card} />
                         })}
                     </div>
                     <div id="deck-part-of-field">
                         <DeckComponent deck={deck} />
                         <div id="leftovers" className="black-transparent">
-                            {[...Array(leftovers)].slice(0,8).map((_, index) => {
+                            {[...Array(leftovers)].slice(0, 8).map((_, index) => {
                                 return <div className="deck-card" key={`${index} `} style={{ '--i': index } as React.CSSProperties}>
                                     <img src="/images/cards/reverse_card.svg" alt="" />
                                 </div>

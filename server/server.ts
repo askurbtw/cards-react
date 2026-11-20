@@ -1,4 +1,5 @@
 import http, { IncomingMessage, ServerResponse } from "http";
+import 'dotenv/config'
 import { randomUUID } from "node:crypto";
 import createGame from "../shared/gameLogic/createGame.js";
 import { type Room } from "../shared/types/index.js";
@@ -16,6 +17,7 @@ import beginGame from "./utils/beginGame.js";
 import endRound from "../shared/gameLogic/endRound.js";
 import connectRedis from "./utils/connectRedis.js";
 import type { RedisClientType } from "redis";
+
 
 const PORT = Number(process.env.PORT) || 8000 ;
 const ALLOWED_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173'
@@ -304,13 +306,14 @@ io.on("connection", (socket) => {
     room.state=newState
     
     if (newState && newState.currentId !== player.id) {
-      if (room.state.isSinglePlayer) {
+      
         const stateHistory = playBotMoves(room);
         io.to(socket.id).emit("broadcast", stateHistory);
-      } else {
+      
+    }
+    else {
         broadcastState(io, room);
       }
-    }
   });
 });
 
