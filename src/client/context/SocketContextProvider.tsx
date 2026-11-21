@@ -11,6 +11,7 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
         return window.localStorage.getItem("token")
     })
     const [socket, setSocket] = useState<Socket | null>(null)
+    const [socketID,setSocketID] = useState<string | undefined>(undefined)
 
 
     useEffect(()=>{
@@ -23,9 +24,9 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
         })
         socket.on("connect", () => {
             setSocket(socket)
-            
+            setSocketID(socket.id)
+            console.log(socket.id)
             console.log("connected")
-            
         })
         return ()=>{
             socket.disconnect()
@@ -37,10 +38,9 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
         window.localStorage.setItem("token", token)
     }
     const contextValue: SocketContextType= {
+        socketID,
         token,
         socket,
-        
-        
         updateToken
     }
 

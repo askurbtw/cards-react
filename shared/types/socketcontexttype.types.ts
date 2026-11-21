@@ -3,7 +3,7 @@ import type { Socket } from 'socket.io-client';
 export default interface SocketContextType{
     token:string | null,
     socket: Socket | null,
-    
+    socketID: string | undefined,
    
     updateToken:(token: string)=>void
     

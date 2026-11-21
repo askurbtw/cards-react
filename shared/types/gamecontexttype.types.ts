@@ -14,7 +14,7 @@ export interface GameContextType {
     token:string | null;
     myPlayerId:number| null;
     
-    rejoin: (roomID:string, token:string)=>void;
+    rejoin: (roomID:string)=>void;
     
     
     

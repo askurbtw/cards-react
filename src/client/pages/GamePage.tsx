@@ -4,38 +4,35 @@ import '../../style.css'
 import PlayerComponent from '../components/PlayerComponent'
 import TableComponent from '../components/TableComponent'
 import getPlayer from '@shared/utils/getPlayer'
-import { useSocket } from '../context/SocketContext'
+
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useSocket } from '../context/SocketContext'
 
 
 export default function GamePage() {
     const navigate = useNavigate()
     const { game, rejoin } = useGame()
-    const { socket, token } = useSocket()
+    const {socketID,token} = useSocket()
+    const path = window.location.pathname
+    const roomID = path.split('/')[2]
+    useEffect(()=>{
+        if(!socketID || !token)
+            return
+        const result = rejoin(roomID)
+        console.log(result)
+    },[socketID,token,rejoin,roomID])
     const handleGoBack = () => {
 
         navigate(`/`)
     }
-    const path = window.location.pathname
-    const roomID = path.split('/')[2]
     if (!game) {
         console.log("no game")
-        if (!socket) {
-            return (<div>
-                <h1>Loading...</h1>
-            </div>)
-        }
-
-        console.log(roomID)
-
         if (!roomID) {
             alert("Room undefined.")
             navigate(`/`)
         }
-        rejoin(roomID, token || '')
-
         return
-        // return <Navigate to='/' replace />
     }
     const gameText = game.status === "waiting for players" ? `Waiting for ${game.numberOfPlayers - game.playersOnline} more players` :
         game.currentId !== undefined && game.attackerId !== undefined && game.defenderId !== undefined ? game.currentId === game.attackerId

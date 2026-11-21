@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { type ReactNode } from "react";
 import { GameContext } from "./GameContext";
 import type { GameContextType, GameView } from "@shared/types";
@@ -26,6 +26,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         if (!socket) {
             return
         }
+        
         console.log("loading listeners")
         socket.on("broadcast", async (newState: GameView[]) => {
             console.log("broadcast", newState)
@@ -45,7 +46,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             socket.removeAllListeners()
         }
 
-    }, [socket])
+    }, [socket,token])
 
     const joinRoomAsync = (data: { state: GameView, roomId: string, playerName: string }, gameType: 's' | 'm') => {
         if (!socket) {
@@ -124,6 +125,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
 
             }
             const data = await response.json();
+            console.log(data.roomId)
             await joinRoomAsync({ state: data.state, roomId: data.roomId, playerName }, gameType)
             console.log("resolved")
             return data.roomId
@@ -192,15 +194,16 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         return error ? error : 'Success.'
 
     }
-    const rejoin = (roomID: string, token: string) => {
-        console.log("rejoining")
+    const rejoin = useCallback((roomID: string) => {
         if (!socket) return 'Socket error.'
         if (!token) return 'No token.'
+        console.log("rejoining", socket, token)
         socket.emit('rejoin', { roomID, token }, (playerID: number) => {
+            console.log("rejoined")
             console.log(playerID)
             setMyPlayerId(playerID)
         })
-    }
+    },[socket,token])
 
     const contextValue: GameContextType = {
         numberOfPlayers,

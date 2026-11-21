@@ -1,6 +1,9 @@
 import { createClient, type RedisClientType } from "redis";
 import customDelay from "../../shared/utils/customDelay.js";
 
+
+let redisClient: RedisClientType | null = null;
+
 async function connectWithTimeout(
   client:RedisClientType,
   delay:number
@@ -50,6 +53,7 @@ export default async function connectRedis(
       client.on("ready", () => {
         console.log(`Redis is ready.`);
       });
+      redisClient = client
       return client;
     } catch (err) {
       console.warn(`Redis couldn't connect on ${i} try.`);
@@ -64,4 +68,11 @@ export default async function connectRedis(
     }
   }
   throw new Error(`Redis exit out of retry loop`);
+}
+
+export const getRedis = ()=>{
+  if(redisClient) return redisClient
+  else{
+    throw new Error(`No redis found.`)
+  }
 }
