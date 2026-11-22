@@ -1,10 +1,10 @@
 :root {
     --card-short: 11vmin;
-    --card-long: calc(11vmin * 1.4); 
-    --card-short-pl-1: 13vmin;
-    --card-long-pl-1: calc(15vmin );
-}
+    --card-long: calc(11vmin * 1.4);
 
+    --card-short-pl-1: clamp(80px, 22vmin, 130px);
+    --card-long-pl-1: calc(var(--card-short-pl-1) * 1.2);
+}
 body, html {
     font-family: 'Montserrat', system-ui, sans-serif;
     width: 100%;
@@ -134,7 +134,10 @@ body, html {
     align-items: center;
     justify-self: center;
 }
-
+#player-1 .cards-wrapper{
+    width: 100%;
+    height:60%
+}
 
 /* --- ГРАВЕЦЬ 3 (Правий) --- */
 #player-4 {
@@ -353,7 +356,7 @@ cursor: pointer;}
     --center: calc((var(--c) - 1) / 2);
     --offset: calc(var(--index) - var(--center));
 
-    --spacing: clamp(3vmin, calc(18vmin / var(--c)), 5vmin);
+    --spacing: calc(var(--card-short) * 0.27);
     --x: calc(var(--offset) * var(--spacing));
 
     --angle-step: clamp(4deg, calc(50deg / var(--c)), 8deg);
@@ -372,10 +375,7 @@ cursor: pointer;}
     transition: transform 0.2s ease, z-index 0s;
 }
 
-#player-1.hand ul,
-#player-3.hand ul {
-    width: 45vmin;
-}
+
 
 #player-2.hand ul,
 #player-4.hand ul {
@@ -813,15 +813,19 @@ ol li{
     
     width: clamp(70px, var(--card-short),  );
 }
-#player-1.hand ul,
-#player-1.hand li{
-    height: clamp(104px, var(--card-long-pl-1), calc(var(--card-long-pl-1) * 1.4));
-    width: clamp(87px, var(--card-short-pl-1), calc(var(--card-short-pl-1) * 1.2));
-}
-#player-1.hand li img{
+#player-1.hand ul{
     width: 100%;
     height: 100%;
-    object-fit: contain;
+}
+#player-1.hand li {
+    height: var(--card-long-pl-1);
+    width: var(--card-short-pl-1)
+}
+#player-1.hand li img{
+    display: block;
+    height: 100%;
+    width: 100%;
+    object-fit: fill;
 }
 #player-1.hand .the-card{
    height: 100%;

@@ -19,15 +19,18 @@ import type { RedisClientType } from "redis";
 import getRoomHash from "./utils/getRoomHash.js";
 import getRoomId from "./utils/getRoomId.js";
 import updateRedisRoom from "./utils/updateRedisRoom.js";
+import { pool } from "./utils/connectPostgre.js";
+import createUser from "./utils/createUserBD.js";
+import createRoom from "./utils/createRoomBD.js";
+import updateRoomBD from "./utils/updateRoomBD.js";
+import closeHttp from "./utils/closeHttp.js";
 
 const PORT = Number(process.env.PORT) || 8000;
 const ALLOWED_ORIGIN = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
 
 const joinRoomPattern = /^\/routes\/join\/room\/([^/]+)$/;
 
-
-
-
+let isShuttingDown = false;
 let redisClient: RedisClientType | null = null;
 try {
   redisClient = await connectRedis();
@@ -35,7 +38,7 @@ try {
   console.error(err);
   process.exit(1);
 }
-
+console.log(pool);
 const server = http.createServer(
   async (req: IncomingMessage, res: ServerResponse) => {
     res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
@@ -45,7 +48,11 @@ const server = http.createServer(
       "Content-Type, Authorization",
     );
     res.setHeader("Vary", "Origin");
-
+    if (isShuttingDown) {
+      res.writeHead(503, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Server is shutting down" }));
+      return;
+    }
     if (req.method === "OPTIONS") {
       res.writeHead(204);
       res.end();
@@ -59,49 +66,48 @@ const server = http.createServer(
       return res.end(JSON.stringify({ error: "Missing request URL" }));
     }
     if (req.method === "POST" && req.url === "/routes/create/room") {
-      try{
-      const roomId = randomUUID();
-      const data = await getData<CreateRoomRequest>(req);
-      console.log(data);
-      const state = createGame(data.numberOfPlayers, data.gameType);
-      const room = {
-        roomId,
-        state,
-        tokens: new Map(),
-        sockets: new Map(),
-      };
-      
-      await updateRedisRoom(room)
-      const response = {
-        roomId,
-        state: gameView(state, roomId),
-      };
-      const room1  = await getRoomHash(roomId)
-      console.log(room1)
-      res.writeHead(201, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(response));
-    }
-    catch(err){
-      console.error(`Error:`, err)
-      res.writeHead(503, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(err));
-    }
+      try {
+        const roomId = randomUUID();
+        const data = await getData<CreateRoomRequest>(req);
+        console.log(data);
+        const state = createGame(data.numberOfPlayers, data.gameType);
+        const room = {
+          roomId,
+          state,
+          tokens: new Map(),
+          sockets: new Map(),
+        };
+        await createRoom(roomId, data.gameType);
+        await updateRedisRoom(room);
+        const response = {
+          roomId,
+          state: gameView(state, roomId),
+        };
+        const room1 = await getRoomHash(roomId);
+        console.log(room1);
+        res.writeHead(201, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(response));
+      } catch (err) {
+        console.error(`Error:`, err);
+        res.writeHead(503, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(err));
+      }
     }
     if (req.method === "POST" && joinRoomPattern.test(req.url)) {
-      if(!redisClient){
+      if (!redisClient) {
         res.writeHead(409, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Unexpected error." }));
         return;
       }
-      const roomId = getRoomId(req,joinRoomPattern)
-      if (!roomId ) {
+      const roomId = getRoomId(req, joinRoomPattern);
+      if (!roomId) {
         res.writeHead(409, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "No roomid specified." }));
         return;
       }
-      const room = await getRoomHash(roomId)
-      
-      if (!room ) {
+      const room = await getRoomHash(roomId);
+
+      if (!room) {
         res.writeHead(409, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "No room found." }));
         return;
@@ -116,7 +122,7 @@ const server = http.createServer(
         roomId: room.roomId,
         state: gameView(room.state, room.roomId),
       };
-      
+
       res.writeHead(201, { "Content-Type": "application/json" });
       res.end(JSON.stringify(response));
       return;
@@ -128,51 +134,65 @@ const io = new Server(server, { cors: { origin: ALLOWED_ORIGIN } });
 
 io.on("connection", (socket) => {
   socket.on("join_room", async (data, callback) => {
-    try{
-    console.log("Joining1");
-    console.log(data.roomId)
-    const room = await getRoomHash(data.roomId)
-    if (!room) return callback({ error: "No room found" });
-    if (room.state.numberOfPlayers === room.state.playersOnline)
-      return callback({ error: "Room is full" });
-    const player = initializePlayer(data.playerName, room.state.playersOnline);
-    const playerToken = randomUUID();
-    room.state.players.push(player);
-    socket.join(data.roomId);
-    room.sockets.set(socket.id, playerToken);
-    room.tokens.set(playerToken, player.id);
-    room.state.playersOnline += 1;
-    console.log("Joining2");
-    if (room.state.playersOnline === room.state.numberOfPlayers) {
-      console.log("Full");
-      const newState = beginGame(room.state);
-      if (newState) {
-        room.state = newState;
-        await updateRedisRoom(room)
-        console.log(room.state);
-        callback({
-          data: { playerID: player.id, token: playerToken },
-          error: "",
-        });
-        broadcastState(io, room);
-
-        return;
+    try {
+      console.log("Joining1");
+      console.log(data.roomId);
+      const room = await getRoomHash(data.roomId);
+      if (!room) return callback({ error: "No room found" });
+      if (room.state.numberOfPlayers === room.state.playersOnline)
+        return callback({ error: "Room is full" });
+      const player = initializePlayer(
+        data.playerName,
+        room.state.playersOnline,
+      );
+      const playerUUID = await createUser(data.playerName);
+      if (!playerUUID) return callback({ error: "Room joining error." });
+      const playerToken = randomUUID();
+      room.state.players.push(player);
+      const result = await updateRoomBD(data.roomId, [
+        { type: "players_ids", ids: [playerUUID] },
+      ]);
+      if (!result) {
+        return callback({ error: "Room joining error." });
       }
+      socket.join(data.roomId);
+      room.sockets.set(socket.id, playerToken);
+      room.tokens.set(playerToken, player.id);
+      room.state.playersOnline += 1;
+      console.log("Joining2");
+      if (room.state.playersOnline === room.state.numberOfPlayers) {
+        console.log("Full");
+        const newState = beginGame(room.state);
+        if (newState) {
+          room.state = newState;
+          await updateRedisRoom(room);
+          console.log(room.state);
+
+          callback({
+            data: { playerID: player.id, token: playerToken },
+            error: "",
+          });
+          broadcastState(io, room);
+
+          return;
+        }
+      }
+      await updateRedisRoom(room);
+      console.log("Joining3");
+      callback({
+        data: { playerID: player.id, token: playerToken },
+        error: "",
+      });
+      broadcastState(io, room);
+    } catch (err) {
+      return callback({ error: err });
     }
-    await updateRedisRoom(room)
-    console.log("Joining3");
-    callback({ data: { playerID: player.id, token: playerToken }, error: "" });
-    broadcastState(io, room);
-  }
-  catch(err){
-    return callback({ error: err });
-  }
   });
   socket.on("player_left", async () => {
     for (const roomID of socket.rooms)
       if (roomID !== socket.id) {
         socket.leave(roomID);
-        const room = await getRoomHash(roomID)
+        const room = await getRoomHash(roomID);
         if (!room) return;
         if (room) {
           const playerToken = room.sockets.get(socket.id);
@@ -185,15 +205,16 @@ io.on("connection", (socket) => {
           room.sockets.delete(socket.id);
           room.state.playersOnline -= 1;
         }
-        await updateRedisRoom(room)
+        await updateRedisRoom(room);
         console.log(room.state.players);
         broadcastState(io, room);
       }
   });
   socket.on("make_move", async (cardId, callback) => {
+    try{
     const roomID = Array.from(socket.rooms)[1];
-    console.log(roomID, socket.rooms)
-    const room = await getRoomHash(roomID)
+    console.log(roomID, socket.rooms);
+    const room = await getRoomHash(roomID);
 
     if (!room) {
       console.log("No room");
@@ -204,8 +225,7 @@ io.on("connection", (socket) => {
       console.log("No token");
       return;
     }
-    
-     
+
     const playerID = room.tokens.get(token);
 
     if (playerID === undefined) {
@@ -220,13 +240,6 @@ io.on("connection", (socket) => {
     const moveType =
       room.state.currentId === room.state.attackerId ? "attack" : "defence";
     const { isCardValid, card } = checkValidCard(cardId, room.state, moveType);
-    console.log(socket.rooms)
-    console.log(room.sockets)
-    console.log(room.state.players)
-    console.log("-----------")
-    console.log(room.state)
-    console.log(card)
-    console.log(isCardValid)
     if (!isCardValid || !card) {
       console.log("Invalid move.");
       return callback({ error: "Invalid move." });
@@ -255,15 +268,24 @@ io.on("connection", (socket) => {
     } else {
       broadcastState(io, room);
     }
-    await updateRedisRoom(room)
+    await updateRedisRoom(room);
     if (room.state.status === "finished") {
+      await updateRoomBD(roomID,[{type:'status', status:'finished'}])
       io.in(roomID).socketsLeave(roomID);
     }
+  }
+  catch(err){
+    console.error(err)
+    return callback({ error: "Something went wrong" });
+  }
+    
   });
 
   socket.on("make_pass", async (callback) => {
+    try{
+
     const roomID = Array.from(socket.rooms)[1];
-    const room = await getRoomHash(roomID)
+    const room = await getRoomHash(roomID);
     console.log(room);
     if (!room) return;
     const token = room?.sockets.get(socket.id);
@@ -289,10 +311,17 @@ io.on("connection", (socket) => {
     } else {
       broadcastState(io, room);
     }
-    await updateRedisRoom(room)
+    await updateRedisRoom(room);
     if (room.state.status === "finished") {
+      await updateRoomBD(roomID,[{type:'status', status:'finished'}])
       io.in(roomID).socketsLeave(roomID);
     }
+  }
+  catch(err){
+    console.error(err)
+    return callback({ error: "Something went wrong" });
+    
+  }
   });
   socket.on("rejoin", async (data, callback) => {
     const roomID = data.roomID;
@@ -300,7 +329,7 @@ io.on("connection", (socket) => {
     console.log(token, roomID);
     if (!token) return;
     console.log(roomID);
-    const room = await getRoomHash(roomID)
+    const room = await getRoomHash(roomID);
 
     if (!room) {
       console.log("No room");
@@ -314,17 +343,17 @@ io.on("connection", (socket) => {
     callback(playerID);
     room.sockets.set(socket.id, token);
     socket.join(roomID);
-    await updateRedisRoom(room)
+    await updateRedisRoom(room);
     broadcastState(io, room);
   });
   socket.on("disconnect", async (reason) => {
     console.log(`Player ${socket.id} disconnected.`);
     console.log(reason);
     const roomID = Array.from(socket.rooms)[1];
-    const room = await getRoomHash(roomID)
+    const room = await getRoomHash(roomID);
     if (!room) return;
     const result = room.sockets.delete(socket.id);
-    await updateRedisRoom(room)
+    await updateRedisRoom(room);
     if (result) console.log("Socket deleted");
     else return console.log("Socket was not deleted.");
   });
@@ -332,12 +361,20 @@ io.on("connection", (socket) => {
   socket.on("single_player", async (data, callback) => {
     const playerName = data.playerName;
     const roomId = data.roomId;
-    const room = await getRoomHash(roomId)
+    const room = await getRoomHash(roomId);
     if (!room) return callback({ error: "No room found" });
     socket.join(roomId);
     const player = initializePlayer(playerName, room.state.playersOnline);
+    const playerUUID = await createUser(data.playerName);
+    if (!playerUUID) return callback({ error: "Room joining error." });
     const playerToken = randomUUID();
     room.state.players.push(player);
+    const result = await updateRoomBD(data.roomId, [
+      { type: "players_ids", ids: [playerUUID] },
+    ]);
+    if (!result) {
+      return callback({ error: "Room joining error." });
+    }
     callback({ data: { playerID: player.id, token: playerToken }, error: "" });
     socket.join(data.roomId);
     room.sockets.set(socket.id, playerToken);
@@ -355,21 +392,54 @@ io.on("connection", (socket) => {
     const newState = beginGame(room.state);
     console.log(newState);
     room.state = newState;
-    await updateRedisRoom(room)
-    const room1 = await getRoomHash(roomId)
-    console.log(room1?.state)
+    await updateRedisRoom(room);
+    const room1 = await getRoomHash(roomId);
+    console.log(room1?.state);
     if (newState && newState.currentId !== player.id) {
       const stateHistory = playBotMoves(room);
-      await updateRedisRoom(room)
+      await updateRedisRoom(room);
       io.to(socket.id).emit("broadcast", stateHistory);
     } else {
       broadcastState(io, room);
     }
-    console.log(socket.rooms)
-    console.log(room.sockets)
+    console.log(socket.rooms);
+    console.log(room.sockets);
   });
 });
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+export default async function shutdown(reason: string) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  console.log(`Shutting down, ${reason}`);
+  try {
+    const forcedTimeout = setTimeout(() => {
+      console.log(`Shutting down after waiting for 10 seconds`);
+      process.exit(1);
+    }, 10000);
+    forcedTimeout.unref();
+    await io.close();
+    console.log("Socket closed.");
+    await closeHttp(server);
+    console.log("Http server closed.");
+    await pool.end();
+    console.log("Pool closed.");
+    await redisClient?.quit()
+    console.log("Redis closed")
+    clearTimeout(forcedTimeout);
+    process.exit(0);
+  } catch (err) {
+    console.error(`Error during shut down:`, err);
+    process.exit(1);
+  }
+}
+
+process.on("SIGINT", async () => {
+  void shutdown("SIGINT");
+});
+process.on("SIGTERM", () => {
+  void shutdown("SIGTERM");
 });
