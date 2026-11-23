@@ -1,4 +1,4 @@
-import type { GameState } from "./gamestate.types.ts";
+import type { GameState } from "./gamestate.types.js";
 
 
 export interface Room {

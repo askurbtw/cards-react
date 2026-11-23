@@ -1,6 +1,6 @@
 
-import { type GameState } from "../types/index.ts";
-import { initializePlayerCard } from "./initializePlayerCard.ts";
+import { type GameState } from "../types/index.js";
+import { initializePlayerCard } from "./initializePlayerCard.js";
 
 
 

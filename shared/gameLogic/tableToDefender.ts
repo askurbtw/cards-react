@@ -1,5 +1,5 @@
-import type { GameState } from "../types/index.ts";
-import getPlayer from "../utils/getPlayer.ts";
+import type { GameState } from "../types/index.js";
+import getPlayer from "../utils/getPlayer.js";
 
 export default function tableToDefender(state:GameState) :GameState {
         const playersCopy = structuredClone(state.players);

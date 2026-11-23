@@ -1,5 +1,5 @@
 
-import type {  Deck, Player } from "../types/index.ts";
+import type {  Deck, Player } from "../types/index.js";
 
 
 export function initializePlayerCard(deck: Deck, player: Player) {

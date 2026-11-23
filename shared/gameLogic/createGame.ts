@@ -1,5 +1,5 @@
-import { type Deck, type GameState, type Player } from "../types/index.ts";
-import createDeck from "./createDeck.ts";
+import { type Deck, type GameState, type Player } from "../types/index.js";
+import createDeck from "./createDeck.js";
 export default function createGame(numberOfPlayers:number, gameType:'s' | 'm') : GameState  {
     const deck : Deck = createDeck()
     const players : Player[] = []

@@ -1,4 +1,4 @@
-import type { Card, DeckCard } from "../types/index.ts";
+import type { Card, DeckCard } from "../types/index.js";
 
 export default function updateLeftovers(cards:DeckCard[], stateLeftovers:Card[]) : Card[] {
     const leftovers = structuredClone(stateLeftovers)

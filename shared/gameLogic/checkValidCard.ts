@@ -1,4 +1,4 @@
-import type {  Card, GameState } from "../types/index.ts";
+import type {  Card, GameState } from "../types/index.js";
 
 
 

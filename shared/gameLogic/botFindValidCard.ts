@@ -1,7 +1,7 @@
 
-import type { Card, GameState } from "../types/index.ts";
-import getPlayer from "../utils/getPlayer.ts";
-import checkValidCard from "./checkValidCard.ts";
+import type { Card, GameState } from "../types/index.js";
+import getPlayer from "../utils/getPlayer.js";
+import checkValidCard from "./checkValidCard.js";
 
 export default function botFindValidCard(state: GameState) : Card{
   const moveType = state.currentId === state.attackerId ? "attack" : "defence";

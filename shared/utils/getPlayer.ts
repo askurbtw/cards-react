@@ -1,4 +1,4 @@
-import type {  Player } from "../types";
+import type {  Player } from "../types/index.js";
 
 export default function getPlayer(players:Player[], playerId:number) : Player {
     const player = players.find(player=>player.id===playerId)

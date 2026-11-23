@@ -1,4 +1,4 @@
-import type { Card } from "../types/index.ts";
+import type { Card } from "../types/index.js";
 
 export default function shuffleCards(deck:Card[]){
     const cardsCopy = [...deck]

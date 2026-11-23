@@ -1,5 +1,5 @@
 
-import type { GameView } from "./gameView.types.ts";
+import type { GameView } from "./gameView.types.js";
 
 
 

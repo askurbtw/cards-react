@@ -1,6 +1,6 @@
-import type { GameState } from "../types/index.ts";
+import type { GameState } from "../types/index.js";
 
-import endRound from "./endRound.ts";
+import endRound from "./endRound.js";
 
 
 export default function makePass(state: GameState): GameState | null {

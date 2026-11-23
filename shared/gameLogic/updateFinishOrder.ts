@@ -1,4 +1,4 @@
-import type { GameState } from "../types/index.ts";
+import type { GameState } from "../types/index.js";
 
 export default function updateFinishOrder(state:GameState) : GameState {
     if (state.deck.cards.length > 0) return state

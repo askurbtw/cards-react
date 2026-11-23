@@ -1,4 +1,4 @@
-import type { GameState } from "../types/index.ts";
+import type { GameState } from "../types/index.js";
 
 export default function findNextPlayers(
   state: GameState,

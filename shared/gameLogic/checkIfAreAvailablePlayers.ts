@@ -1,5 +1,5 @@
-import type { Player } from "../types/index.ts";
-import endGame from "./endGame.ts";
+import type { Player } from "../types/index.js";
+import endGame from "./endGame.js";
 
 export default function checkIfAreAvailablePlayers(players:Player[]) : boolean {
     let availablePlayersCount = 0

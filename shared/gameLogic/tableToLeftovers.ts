@@ -1,5 +1,5 @@
-import type { GameState } from "../types/index.ts";
-import updateLeftovers from "./updateLeftovers.ts";
+import type { GameState } from "../types/index.js";
+import updateLeftovers from "./updateLeftovers.js";
 
 export default function tableToLeftovers(state:GameState) :GameState {
     const currentCardsCopy = structuredClone(state.currentCards)

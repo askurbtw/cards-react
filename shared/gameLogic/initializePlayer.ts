@@ -1,4 +1,4 @@
-import {  type Player } from "../types/index.ts";
+import {  type Player } from "../types/index.js";
 
 
 export function initializePlayer(playerName:string, currentNumberOfPlayers:number): Player{
