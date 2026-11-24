@@ -1,7 +1,7 @@
 
 import { pool } from "./connectPostgre.js";
 
-export default async function createRoom(roomId:string, gameType:'s' | 'm') {
+export default async function createRoomBD(roomId:string, gameType:'s' | 'm') {
     try{
     
     const game_type = gameType==='s'?'singleplayer' : 'multiplayer'

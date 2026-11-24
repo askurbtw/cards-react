@@ -3,6 +3,7 @@ import { RedisService } from './redis/redis.service.js';
 import { PostgresqlService } from './postgresql/postgresql.service.js';
 
 @Module({
-  providers: [RedisService, PostgresqlService]
+  providers: [RedisService, PostgresqlService],
+  exports:[RedisService, PostgresqlService]
 })
 export class DatabasesModule {}

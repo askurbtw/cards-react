@@ -20,5 +20,5 @@
     "strictPropertyInitialization": false,
     "types": ["vitest/globals", "node"]
   },
-  "include": ["./**/*.ts", "../shared", "utils/getData.ts"]
+  "include": ["./**/*.ts", "../shared", "utils/getData.ts", "../server/utils"]
 }

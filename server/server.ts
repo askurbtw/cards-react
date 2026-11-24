@@ -21,9 +21,9 @@ import getRoomId from "./utils/getRoomId.js";
 import updateRedisRoom from "./utils/updateRedisRoom.js";
 import { pool } from "./utils/connectPostgre.js";
 import createUser from "./utils/createUserBD.js";
-import createRoom from "./utils/createRoomBD.js";
 import updateRoomBD from "./utils/updateRoomBD.js";
 import closeHttp from "./utils/closeHttp.js";
+import createRoomBD from "./utils/createRoomBD.js";
 
 const PORT = Number(process.env.PORT) || 8000;
 const ALLOWED_ORIGIN = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
@@ -77,7 +77,7 @@ const server = http.createServer(
           tokens: new Map(),
           sockets: new Map(),
         };
-        await createRoom(roomId, data.gameType);
+        await createRoomBD(roomId, data.gameType);
         await updateRedisRoom(room);
         const response = {
           roomId,
