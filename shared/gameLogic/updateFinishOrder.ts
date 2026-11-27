@@ -7,13 +7,13 @@ export default function updateFinishOrder(state:GameState) : GameState {
     playersCopy.forEach(player => {
         if(player.isOutOfCards===false && player.cards.length===0){
             player.isOutOfCards=true
-            finishOrder.push(player.id)
+            finishOrder.push({playerIngameId:player.id , playerUUID:player.uuid})
         }
     });
     if(finishOrder.length>=playersCopy.length-1){
         const lastPlayer = playersCopy.find(player=>player.isOutOfCards===false)
         if(lastPlayer)
-        finishOrder.push(lastPlayer.id)
+        finishOrder.push({playerIngameId:lastPlayer.id , playerUUID:lastPlayer.uuid})
         return {
         ...state,
         players:playersCopy,

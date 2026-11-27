@@ -17,11 +17,13 @@ export default function GamePage() {
     const path = window.location.pathname
     const roomID = path.split('/')[2]
     useEffect(()=>{
-        if(!socketID || !token)
+        if(game || (!socketID || !token))
             return
+        
+        console.log("rejoining")
         const result = rejoin(roomID)
         console.log(result)
-    },[socketID,token,rejoin,roomID])
+    },[game,socketID,token,rejoin,roomID])
     const handleGoBack = () => {
 
         navigate(`/`)
@@ -45,12 +47,12 @@ export default function GamePage() {
             <div id='game-page'>
                 <div id="game-grid">
                     <div id='game-results-card'>
-                        <h1>{`Winner is: ${getPlayer(game.players, game.finishOrder[0]).name}`}</h1>
+                        <h1>{`Winner is: ${getPlayer(game.players, game.finishOrder[0].playerIngameId).name}`}</h1>
                         <h2>Finish order</h2>
                         <ol>
                             {game.finishOrder.map((player) => {
                                 return (
-                                    <li>{getPlayer(game.players, player).name}</li>
+                                    <li>{getPlayer(game.players, player.playerIngameId).name}</li>
                                 )
                             })}
                         </ol>

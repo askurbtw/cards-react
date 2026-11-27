@@ -141,11 +141,14 @@ io.on("connection", (socket) => {
       if (!room) return callback({ error: "No room found" });
       if (room.state.numberOfPlayers === room.state.playersOnline)
         return callback({ error: "Room is full" });
+      const playerUUID = await createUser(data.playerName);
+      if(!playerUUID) return callback({ error: "Error during user creation." });
       const player = initializePlayer(
         data.playerName,
+        playerUUID,
         room.state.playersOnline,
       );
-      const playerUUID = await createUser(data.playerName);
+      
       if (!playerUUID) return callback({ error: "Room joining error." });
       const playerToken = randomUUID();
       room.state.players.push(player);
@@ -364,8 +367,10 @@ io.on("connection", (socket) => {
     const room = await getRoomHash(roomId);
     if (!room) return callback({ error: "No room found" });
     socket.join(roomId);
-    const player = initializePlayer(playerName, room.state.playersOnline);
     const playerUUID = await createUser(data.playerName);
+    if(!playerUUID) return callback({ error: "User creating error." })
+    const player = initializePlayer(playerName, playerUUID, room.state.playersOnline);
+    
     if (!playerUUID) return callback({ error: "Room joining error." });
     const playerToken = randomUUID();
     room.state.players.push(player);
@@ -384,6 +389,7 @@ io.on("connection", (socket) => {
     for (counter; counter < room.state.numberOfPlayers; counter++) {
       const newBot = initializePlayer(
         `Bot#${counter}`,
+        '',
         room.state.players.length,
       );
       room.state.players.push(newBot);

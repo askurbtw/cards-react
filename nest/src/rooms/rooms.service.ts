@@ -8,6 +8,8 @@ import gameView from '../../../server/utils/gameView.js';
 import { initializePlayer } from '../../../shared/gameLogic/initializePlayer.js';
 import beginGame from '../../../server/utils/beginGame.js';
 import { Room } from '../../../shared/types/room.types.js';
+import { DomainError } from '../common/errors/domain.error.js';
+import playBotMoves from '../../../server/utils/playBotMoves.js';
 
 @Injectable()
 export class RoomsService {
@@ -15,7 +17,7 @@ export class RoomsService {
     private readonly redis: RedisService,
     private readonly pool: PostgresqlService,
   ) {}
-  async createRoom(data: CreateRoomRequest) {
+  async createRoom(data: CreateRoomRequest)  {
     try {
       const roomId = randomUUID();
       console.log(data);
@@ -35,28 +37,23 @@ export class RoomsService {
       return response;
     } catch (err) {
       console.error(`Error:`, err);
-      throw new Error(`Error during room creation`, { cause: err });
+      throw new DomainError('INTERNAL_ERROR', 'Something went wrong during room creation.')
     }
   }
   async joinRoom(data: {
     roomId: string;
     playerName: string;
     socketId: string;
-  }): Promise<Room | undefined> {
+  }): Promise<Room> {
     const room = await this.redis.getRoom(data.roomId);
-    if (!room) return;
-    if (room.state.numberOfPlayers === room.state.playersOnline) return;
-    const player = initializePlayer(data.playerName, room.state.playersOnline);
+    if (room.state.numberOfPlayers === room.state.playersOnline) throw new DomainError('CONFLICT', 'Room is full.');
     const playerUUID = await this.pool.createUser(data.playerName);
-    if (!playerUUID) return;
+    const player = initializePlayer(data.playerName, playerUUID, room.state.playersOnline);
     const playerToken = randomUUID();
     room.state.players.push(player);
-    const result = await this.pool.updateRoom(data.roomId, [
+    await this.pool.updateRoom(data.roomId, [
       { type: 'players_ids', ids: [playerUUID] },
     ]);
-    if (!result) {
-      return;
-    }
     room.sockets.set(data.socketId, playerToken);
     room.tokens.set(playerToken, player.id);
     room.state.playersOnline += 1;
@@ -79,26 +76,66 @@ export class RoomsService {
     roomID: string;
     token: string;
     socketId: string;
-  }): Promise<Room | undefined> {
+  }): Promise<{room:Room, playerId:number}> {
+    console.log("Rejoining")
     const room = await this.redis.getRoom(data.roomID);
-    if (!room) {
-      console.log('No room');
-      return;
-    }
     const playerID = room.tokens.get(data.token);
     if (playerID === undefined) {
-      console.log('No player');
-      return;
+      throw new DomainError('CONFLICT', 'No token.')
     }
     room.sockets.set(data.socketId, data.token);
     await this.redis.updateRoom(room);
-    return room;
+    return {room, playerId:playerID};
   }
+
   async disconnect(data: { roomID: string; socketID: string }) {
     const room = await this.redis.getRoom(data.roomID);
-    if (!room) return;
     const result = room.sockets.delete(data.socketID);
+    if(result===false) throw new Error(`Something went wrong.`)
     await this.redis.updateRoom(room);
-    return result;
+    
+  }
+
+  async joinSinglePlayer(roomId:string, playerName:string, socketId:string){
+  
+    const room = await this.redis.getRoom(roomId);
+    if (!room) throw new DomainError(`NOT_FOUND`,'Room not found.')
+    
+    const playerUUID = await this.pool.createUser(playerName);
+    const player = initializePlayer(playerName, playerUUID, room.state.playersOnline);
+    const playerToken = randomUUID();
+    room.state.players.push(player);
+    await this.pool.updateRoom(roomId, [
+      { type: "players_ids", ids: [playerUUID] },
+    ]);
+  
+    
+    room.sockets.set(socketId, playerToken);
+    room.tokens.set(playerToken, player.id);
+    room.state.playersOnline += 1;
+    let counter = room.state.players.length;
+    for (counter; counter < room.state.numberOfPlayers; counter++) {
+      const newBot = initializePlayer(
+        `Bot#${counter}`,
+        '',
+        room.state.players.length,
+      );
+      room.state.players.push(newBot);
+      room.state.playersOnline += 1;
+    }
+    const newState = beginGame(room.state);
+    console.log(newState);
+    room.state = newState;
+    await this.redis.updateRoom(room);
+    
+    if (newState && newState.currentId !== player.id) {
+      const stateHistory = playBotMoves(room);
+      await this.redis.updateRoom(room);
+      
+      return {stateHistory, room, playerId:player.id, playerToken}
+    } else {
+      return {stateHistory:null, room, playerId:player.id, playerToken}
+    }
+    
   }
 }

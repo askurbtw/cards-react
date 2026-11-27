@@ -3,6 +3,7 @@ import { createClient, type RedisClientType } from 'redis';
 import customDelay from '../../../../shared/utils/customDelay.js';
 import { Room } from '../../../../shared/types/room.types.js';
 import { GameState } from '../../../../shared/types/gamestate.types.js';
+import { DomainError } from '../../common/errors/domain.error.js';
 async function connectWithTimeout(
   client: RedisClientType,
   delay: number,
@@ -173,7 +174,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     const room = parseFullRoom(id,roomRaw,state)
     return room
     }
-    return undefined
+    throw new DomainError('NOT_FOUND','Room not found.')
   } catch (err) {
     console.error(err);
     throw new Error(`Error getting room.`, {cause:err})

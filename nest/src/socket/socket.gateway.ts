@@ -2,7 +2,11 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, WebSocketGatew
 import { SocketService } from './socket.service.js';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({cors:{
+    origin: process.env.CLIENT_ORIGIN ?? "http://localhost:5173",
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }})
 export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly socketService: SocketService) {}
   afterInit(server: Server)  {

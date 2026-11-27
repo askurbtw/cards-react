@@ -16,6 +16,6 @@ export type GameState = {
   movesCounter: number;
   disablePassButton: boolean;
   status: "playing" | "finished" | "waiting for players";
-  finishOrder: number[];
+  finishOrder: {playerIngameId:number,playerUUID:string}[];
   isSinglePlayer :boolean;
 };

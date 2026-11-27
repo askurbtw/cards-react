@@ -28,6 +28,9 @@ export const SocketContextProvider = ({ children }: { children: ReactNode }) => 
             console.log(socket.id)
             console.log("connected")
         })
+        socket.on("exception",(err)=>{
+            console.log(err)
+        })
         return ()=>{
             socket.disconnect()
         }

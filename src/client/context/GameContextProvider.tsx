@@ -71,6 +71,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
                 const stateCopy = structuredClone(data.state)
                 stateCopy.players = players
                 setGame(stateCopy)
+                console.log(response.data)
                 updateToken(response.data.token)
                 setNumberOfPlayers(data.state.numberOfPlayers)
                 console.log(data)
@@ -109,7 +110,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             }
             setNumberOfPlayers(numberOfPlayers)
             setPlayerName(playerName)
-            const response = await fetch(`${API_URL}/routes/create/room`, {
+            const response = await fetch(`${API_URL}/rooms/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -141,7 +142,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             if (!socket) {
                 throw new Error('Socket error. Maybe render service is waking up, try again later.')
             }
-            const response = await fetch(`${API_URL}/routes/join/room/${roomID}`, {
+            const response = await fetch(`${API_URL}/join/room/${roomID}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
